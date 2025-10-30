@@ -1,0 +1,1236 @@
+---
+title: "Data Preparation"
+author: "Todd Nobles"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE)
+library(dataverse)
+library(haven)
+library(GGally)
+library(tidycensus)
+library(naniar)
+library(tidyverse)
+library(janitor)
+library(ipumsr)
+library(sjPlot)
+library(socviz)
+
+conflicted::conflict_prefer("select", "dplyr")
+conflicted::conflicts_prefer(dplyr::lag)
+conflicted::conflicts_prefer(dplyr::filter)
+conflicted::conflicts_prefer(tidyr::replace_na)
+options(scipen=999)
+
+```
+
+# Importing CES data
+The two chunks below that read in the CES data. 
+
+This chunk reads in the pre-aligned survey responses for common modules of the CES. Due to the way the CES dataverse files are updated, the first of these calls no longer runs with the given file name as it now includes more recent years. Due to this the chunk is set to not evaluate and the data files for replication are included in the "data" folder of this repository in the state for reproducing the original manuscript. I have not tested if any additional changes to more recent CES dataverse files would impact the results, although I suspect that downloading the most recent version and filtering to only the earlier years used in this article would recreate these files in the version that these original calls produced. 
+
+```{r, eval= FALSE, include = FALSE}
+common <- get_dataframe_by_name(
+  filename = "cumulative_2006-2022.dta",
+  dataset = "10.7910/DVN/II2DB6",
+  server = "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+)
+
+saveRDS(common,
+        "../data/common.rds")
+
+
+## load preferences
+preferences <- get_dataframe_by_name(
+  filename = "cumulative_ces_policy_preferences.tab",
+  dataset = "10.7910/DVN/OSXDQO",
+  server = "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+)
+
+saveRDS(preferences,
+        "../data/preferences.rds")
+```
+
+The below chunk reads in the residency information from the annual CES administrations. 
+
+```{r, eval= FALSE, include = FALSE}
+common_2010 <- get_dataframe_by_name(
+  filename = "cces_2010_common_validated.dta",
+  dataset = "10.7910/DVN/VKKRWA",
+  server = "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V100, V258, V259, CC351)  %>% 
+  mutate(year = 2010)
+saveRDS(common_2010,
+        "../data/residency_2010.rds")
+
+common_2011 <- get_dataframe_by_name(
+  filename = "CCES11_Common_OUTPUT.tab",
+  dataset = "10.7910/DVN/GLRXZ0",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V100, V258, V259, CC307) %>% 
+  mutate(year = 2011)
+saveRDS(common_2011,
+       "../data/residency_2011.rds")
+
+common_2012 <- get_dataframe_by_name(
+  filename = "CCES12_Common_VV.tab",
+  dataset = "10.7910/DVN/HQEVPK",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V101, CC351) %>% 
+  mutate(year = 2012)
+saveRDS(common_2012,
+        "../data/residency_2012.rds")
+
+common_2013 <- get_dataframe_by_name(
+  filename = "Common Content Data.tab",
+  dataset = "10.7910/DVN/KPP85M",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(caseid, CC351) %>% 
+  mutate(year = 2013)
+saveRDS(common_2013,
+      "../data/residency_2013.rds")
+
+common_2014 <- get_dataframe_by_name(
+  filename = "CCES14_Common_Content_Validated.tab",
+  dataset = "10.7910/DVN/XFXJVY",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V101, CC351, citylength_1, citylength_2) %>% 
+  mutate(year = 2014)
+saveRDS(common_2014,
+        "../data/residency_2014.rds")
+
+common_2016 <- get_dataframe_by_name(
+  filename = "CCES16_Common_OUTPUT_Feb2018_VV.tab",
+  dataset = "10.7910/DVN/GDF6Z0",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V101, CC16_361, citylength_1, citylength_2) %>% 
+  mutate(year = 2016)
+saveRDS(common_2016,
+        "../data/residency_2016.rds")
+
+common_2017 <- get_dataframe_by_name(
+  filename = "Common Content Data.tab",
+  dataset = "10.7910/DVN/3STEZY",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(V101, citylength_1, citylength_2) %>% 
+  mutate(year = 2017)
+saveRDS(common_2017,
+        "../data/residency_2017.rds")
+
+common_2018 <- get_dataframe_by_name(
+  filename = "cces18_common_vv.dta",
+  dataset = "10.7910/DVN/ZSBZ7K",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(caseid, citylength_1, citylength_2) %>% 
+  mutate(year = 2018)
+saveRDS(common_2018,
+       "../data/residency_2018.rds")
+
+common_2019 <- get_dataframe_by_name(
+  filename = "CCES19_Common_OUTPUT.tab",
+  dataset = "10.7910/DVN/WOT7O8",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(caseid,  citylength_1, citylength_2) %>% 
+  mutate(year = 2019)
+saveRDS(common_2019,
+       "../data/residency_2019.rds")
+
+common_2020 <- get_dataframe_by_name(
+  filename = "CES20_Common_OUTPUT_vv.dta",
+  dataset = "10.7910/DVN/E9N6PH",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(caseid, CC20_361)%>% 
+  mutate(year = 2020)
+
+saveRDS(common_2020,
+        "../data/residency_2020.rds")
+
+common_2021 <- get_dataframe_by_name(
+  filename = "CES21_Common_OUTPUT.tab",
+  dataset = "10.7910/DVN/OPQOCU",
+  server= "dataverse.harvard.edu",
+  original = TRUE,
+  .f = haven::read_dta
+) %>% 
+  select(caseid, CC21_361x ) %>% 
+  mutate(year = 2021)
+saveRDS(common_2021,
+        "../data/residency_2021.rds")
+
+```
+
+
+
+```{r}
+f <- file.path("../data", c("residency_2010.rds", "residency_2011.rds", "residency_2012.rds", "residency_2013.rds", "residency_2014.rds", "residency_2016.rds", "residency_2017.rds", "residency_2018.rds", 'residency_2019.rds', "residency_2020.rds", "residency_2021.rds"))
+
+names <- c("residency_2010", "residency_2011", "residency_2012", "residency_2013", "residency_2014", "residency_2016", "residency_2017", "residency_2018", 'residency_2019', "residency_2020", "residency_2021")
+
+for (i in seq_along(f)) {
+  assign(names[i], readRDS(f[i]))
+}
+```
+
+
+```{r}
+residency_2010 <- residency_2010 %>% rename(caseid = V100, citylength_1 = V258, residency = CC351) %>% select(-V259) %>% mutate(residency = as_factor(residency))
+residency_2011 <- residency_2011 %>% rename(caseid = V100, citylength_1 = V258, residency = CC307) %>% select(-V259) %>% mutate(residency = as_factor(residency))
+residency_2012 <- residency_2012 %>% rename(caseid = V101, residency = CC351) %>% mutate(residency = as_factor(residency))
+residency_2013 <- residency_2013 %>% rename(residency = CC351) %>% mutate(residency = as_factor(residency))
+residency_2014 <- residency_2014 %>% rename(caseid = V101, residency = CC351) %>% select(-citylength_2) %>% mutate(residency = as_factor(residency))
+residency_2016 <- residency_2016 %>% rename(caseid = V101, residency = CC16_361) %>% select(-citylength_2) %>% mutate(residency = as_factor(residency))
+residency_2017 <- residency_2017 %>% rename(caseid = V101) %>% select(-citylength_2)
+residency_2018 <- residency_2018 %>% select(-citylength_2)
+residency_2019 <- residency_2019 %>% select(-citylength_2)
+residency_2020 <- residency_2020 %>% rename(residency = CC20_361) %>% mutate(residency = as_factor(residency))
+residency_2021 <- residency_2021 %>% rename(residency = CC21_361x) %>% mutate(residency = as_factor(residency))
+
+residency <- bind_rows(residency_2010, residency_2011, residency_2012, residency_2013, residency_2014, residency_2016, residency_2017, residency_2018, residency_2019, residency_2020, residency_2021) %>% 
+  mutate(residency = fct_collapse(residency , "Less than 1 year" = c("1-6 months", "7 to 11 months", "7-11 months", "Less than 1 month", "2 to 6 months")),
+         residency = fct_collapse(residency, "1-2 years" = c("1 to 2 years", "1-2 years")),
+         residency = fct_collapse(residency, "3-4 years" = c("3 to 4 years", "3-4 years")),
+         residency = fct_drop(residency),
+         case_id = as.character(caseid))
+
+```
+
+
+Reading in the datasets downloaded above 
+```{r}
+common <-
+  readRDS("../data/common.rds")
+
+preferences <-
+  readRDS("../data/preferences.rds")
+
+cc_full_raw <-
+  inner_join(common, preferences, by = c("year", "case_id")) %>% 
+  left_join(residency, by = c("year", "case_id"))
+```
+
+## Creating Filtered CCES
+Filtering to only include years 2010 and later. 
+```{r}
+
+demo_vars <-
+  c("gender", "age", "educ","hispanic","race","race_h","citizen","religion",
+    "relig_imp","ownhome","has_child","no_milstat","pid3","faminc","employ",
+    "no_healthins","union","economy_retro","newsint", "residency", "citylength_1"
+  )
+
+cc_wd <- cc_full_raw %>% 
+  tidylog::filter(year >= 2010) %>% 
+  tidylog::filter(age >= citylength_1 | is.na(citylength_1)) %>% 
+  select(year:rvweight_post, demo_vars, approval_rep, 
+         vv_turnout_gvm, vv_turnout_pvm,
+         intent_rep, intent_rep_party, intent_rep_chosen, rep_current, 
+         rep_icpsr ) %>% 
+    mutate(
+    rep_icpsr_num = as.numeric(rep_icpsr),
+    congress = as.numeric(as.character(as_factor(cong, levels = "labels"))),
+    state = zap_labels(state),
+    st = as.character(as_factor(st, levels = "labels"))
+  )
+```
+
+
+Turns out the ICPSR keys get carried through correctly for CCES data while names do not get transferred for all reps in all instances. See below for instances where there is a valid ICPSR but their name doesn't get transferred in for these years. 
+```{r}
+cc_wd %>% group_by(rep_icpsr, rep_current) %>% count() %>% filter(rep_current == "")
+```
+
+
+Since I'm interested in whether someone supports a more extreme candidate, I need to take their intent_rep_chosen response and match that with the ideology measures from DIME. Currently, there is no ICPSR value (or other ID) for the intent_rep_chosen variable. In order to avoid having to do name merges for all candidates between the CCES data and the DIME data, I will use the fact that in many cases, rep_current = intent_rep_chosen in the CCES data to get ICPSR values for these candidates. 
+
+I use the CCES data to create a list of ICPSR values for the names we have. Then I'll merge this back in to to the CCES data to assign ICPSR id's to the intent_rep_chosen values. 
+```{r}
+icpsr_name_xwalk <- cc_wd %>% 
+  mutate_at(c("rep_current", "intent_rep_chosen"), ~na_if(., '')) %>% 
+  distinct(cd, rep_icpsr_num, rep_current) %>% 
+  arrange(rep_icpsr_num, desc(rep_current)) %>% 
+  group_by(cd, rep_icpsr_num) %>%
+  fill(rep_current, .direction = "downup") %>% 
+  distinct(cd, rep_icpsr_num, rep_current) %>% 
+  rename(rep_name = rep_current,
+         intent_rep_icpsr = rep_icpsr_num) %>% 
+  na.omit()
+
+
+cc_wd <- left_join(cc_wd, icpsr_name_xwalk,
+                          by = c("intent_rep_chosen" = "rep_name", "cd"="cd"))
+```
+
+Given the many-many merge warnings, I address that here by finding those rows that got merged twice. Turns out it's due to Robert Dole leaving and then rejoining congress later. I'll drop the duplicate rows.
+```{r}
+dups = cc_wd$case_id[duplicated(cc_wd$case_id)] # Get a list of the duplicate cases 
+
+cc_wd %>% 
+       select(case_id , year, cd, dist, rep_current, rep_icpsr, 
+              intent_rep_chosen, intent_rep_icpsr, congress) %>%
+       filter(case_id %in% dups)
+
+## Robert Dold ended up with two ICPSRs due to leaving congress then rejoining. Removing the rows that get merged in with the incorrect icpsr value. 
+cc_wd <- cc_wd %>% 
+  filter(!(case_id %in% dups & 
+             congress == 114 & 
+             intent_rep_icpsr == 21127 ))
+
+
+## now I fill in the ICPSR values for those that we have the name of the intent-rep-chose and it matches the name of the current rep.
+cc_wd <- 
+  cc_wd %>% 
+  filter(!(intent_rep_chosen == "")) %>% 
+  group_by(st, intent_rep_chosen) %>% # districts change over years, but safer bet that candidates don't start a run in a new state
+  fill(intent_rep_icpsr, .direction = "downup")
+```
+
+
+At this point in the code, the CCES dataset has been cleaned and modified to a point where I have only those who reported an intended candidate to vote for in a house election. Additionally, these candidates have ICPSR's attached to them in instances where the name matched an instance where they were an elected official at some other point in the dataset. The rows with ICPSR values for intent_rep_icpsr will merge nicely with the DIME data below that gives us candidate ideology. Now I need to do some name formatting to be able to match candidates who've never won (and therefore don't have an ICPSR value) with the DIME data below. 
+
+```{r}
+cc_wd <- cc_wd %>% 
+  ungroup() %>% 
+  mutate(clean_chosen_rep = str_replace_all(intent_rep_chosen, fixed(c("(R)" = "", 
+                                                                       "(D)" = "", 
+                                                                       "(I)" = "",
+                                                                       "(L)" = "",
+                                                                       "(G)" = "")))) %>% 
+  mutate(clean_chosen_rep = str_replace(clean_chosen_rep, " \\s*\\([^\\)]+\\)", ""),
+         clean_chosen_rep = str_squish(str_trim(clean_chosen_rep))) %>% 
+  separate(clean_chosen_rep, into = c("first_name", "middle_name" ,"last_name"),
+         sep = " ", extra = "merge", remove = FALSE ) %>% 
+   tidylog::mutate(
+      # if you have a suffix at the end of your last name we grab it here 
+      suffix = ifelse(last_name %in% c("Jr.", "Sr.", "JR.", "SR.", "Jr", "Sr",
+                                          "I", "II", "III", "IV", "V"), last_name, NA),
+      length_last = str_length(last_name),
+      # people who had names like Allen Guillroy, Sr. got separated where Sr. was their last name, so above I extract the suffix and now I replace their last_name with middle_name
+      last_name = ifelse(last_name %in% c("Jr.", "Sr.", "JR.", "SR.", "Jr", "Sr",
+                                               "I", "II", "III", "IV", "V"), middle_name, last_name),
+      
+      ## now there are a bunch of people who had only two names, so their last names are stuck in the middle_name column
+      last_name = ifelse(is.na(last_name), middle_name, last_name),
+      ## now most people are listed with the same middle and last_name so I remove middle names for those instances
+      middle_name = ifelse(middle_name == last_name, NA, middle_name),
+    # removing the suffixes that remained attached to peoples' last names after the initial separate command
+    suffix = ifelse(str_detect(last_name, paste(c("Jr.$","Jr$", "JR$", "JR.$",
+                                                  "III$", 
+                                                  "Sr$", "Sr.$", "SR$", "SR.$"),collapse = '|')),
+                    str_extract(last_name, paste(c("Jr.$","Jr$", "JR$", "JR.$",
+                                                  "III$", "II$",
+                                                  "Sr$", "Sr.$", "SR$", "SR.$"),collapse = '|')), suffix),
+    
+    ## now that the suffixes are saved elsewhere, remove them from last_name
+    last_name = str_replace(last_name, 
+                            paste(c("Jr.$","Jr$", "JR$", "JR.$", ", Jr.$",", Jr$", ", JR$", ", JR.$",
+                                    "III$", "II$",
+                                    "Sr$", "Sr.$", "SR$", "SR.$", ", Sr$", ", Sr.$", ", SR$", ", SR.$",
+                                    ",$"),collapse = '|'), 
+                            ""),
+    # removing any nicknames from last names like "Tony" Amador
+    last_name = str_replace(last_name, '^"\\w+" ', "" ),
+    last_name = str_replace(last_name, "^'\\w+' ", ""), 
+    across(c(first_name, middle_name, suffix), ~str_replace_all(.x, "[[:punct:]]", "")),
+    last_name = str_replace(last_name, "-", " "),
+    last_name = str_replace(last_name, "'", ""),
+    across(c(first_name, middle_name, last_name, suffix),~ tolower(.x))
+    )
+
+
+```
+
+### Creating merge district variables 
+modify the district variable to remove the punctuation in it and add a leading zero to the district number if it's a single digit.
+```{r}
+cc_wd <- cc_wd %>% 
+  mutate(merge_district_cd = str_replace(cd, "[[:punct:]]", ""),
+         merge_district_dist_up = paste0(st, str_pad(as.character(dist_up), 2, pad = "0")))
+
+```
+
+
+# Importing DIME ideology scores for candidates
+Here I import the DIME ideology scores for candidates. 
+```{r}
+load("../data/dime_recipients_all_1979_2020.rdata") 
+unique_cands <- cands.all %>% 
+  mutate(cycle = as.numeric(cycle)) %>% 
+  filter(seat == "federal:house" & cycle %in% 2010:2022) %>% 
+  distinct(bonica.rid, .keep_all = TRUE) %>% ## keep only one row per person 
+  ## need to replace "" strings with NA for merging by names here
+  mutate(across(c(mname, title, suffix), ~ifelse(.x == "", NA, .x))) %>% 
+  select(bonica.rid, name, lname, ffname, fname, mname, title, suffix,
+         party, state, seat, district, recipient.cfscore, dwdime, dwnom1, 
+         dwnom2, ICPSR, ICPSR2) %>% 
+  mutate(ICPSR2= ifelse(district == "FL14" & name == "mack, connie", 20503, ICPSR2)) # fixing Connie Mack's ICPSR code
+
+get_dupes(unique_cands, district, fname, lname, suffix) ## A few duplicates left here. Some are because of party switching, so they get a new bonica.rid when they switch. Some a bit unclear why they have a new listing. They get caught later during the merging process if there were individuals in the CEs who indicated they intended to vote for them. 
+
+```
+
+
+The chunk below does some hand modifications for problematic names for merging. Again this is necessary due to these individausl not having ICPSR values and needing to be name merged. 
+```{r}
+cc_for_merge <- cc_wd %>% 
+  tidylog::mutate(intent_rep_icpsr = as.character(intent_rep_icpsr)) %>% 
+  ## Handling GK Butterfield name merge issue for later
+  tidylog::mutate(first_name = ifelse(first_name == "gk", "g", first_name),
+         middle_name = ifelse(first_name == "gk","k", middle_name)
+         ) %>% 
+  ## addressing rick allen merge issue 
+  tidylog::mutate(first_name = ifelse(first_name == "rick" & last_name == "allen" & merge_district_dist_up == "GA12", "richard", first_name)) %>% 
+  ## addressing William lacy clay 
+  tidylog::mutate(intent_rep_icpsr = ifelse((str_detect(clean_chosen_rep, "Lacy") & merge_district_dist_up == "MO01"), "20147", intent_rep_icpsr)) %>% 
+  tidylog::mutate(last_name = ifelse(last_name == "arnoldjones", "arnold jones", last_name)) %>% 
+  tidylog::mutate(first_name = ifelse(first_name == "joseph" & merge_district_dist_up == "NV03", "joe", first_name),
+         suffix = ifelse(first_name == "joe" & merge_district_dist_up == "NV03", NA, suffix)) %>% 
+  tidylog::mutate(suffix = ifelse(first_name == "glenn" & merge_district_dist_up == "PA15", NA, suffix)) %>%
+  tidylog::mutate(suffix = ifelse(first_name == "michael" & merge_district_dist_up == "PA14", "jr", suffix)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up == "FL24" & last_name == "adams" & first_name == "sandra", "21120", intent_rep_icpsr)) %>% 
+  tidylog::mutate(first_name = ifelse(first_name == "josh" & merge_district_dist_up == "NC05", "joshua", first_name)) %>% 
+  tidylog::mutate(first_name = ifelse(last_name == "theron" & merge_district_dist_up == "WI02", "daniel", first_name)) %>% 
+  tidylog::mutate(first_name = ifelse(last_name == "daugherty" & merge_district_dist_up =="PA15", "richard", first_name)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(last_name == "larson" & merge_district_dist_up == "WA02", "20145", intent_rep_icpsr),
+         last_name = ifelse(last_name == "larson" & merge_district_dist_up == "WA02", "larsen", last_name)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up == "NJ02" & last_name == "drew" & first_name == "jeff", "21980", intent_rep_icpsr)) %>% 
+  tidylog::mutate(last_name = ifelse(merge_district_dist_up == "KY03" & last_name == "yarmouth", "yarmuth", last_name)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up == "IN02" & last_name == "swihart", "21330", intent_rep_icpsr)) %>% 
+  tidylog::mutate(last_name = ifelse(merge_district_dist_up == "IN08" & last_name == "haaften", "vanhaaften", last_name),
+         first_name = ifelse(merge_district_dist_up == "IN08" & last_name == "haaften", "william", first_name),
+         middle_name = ifelse(merge_district_dist_up == "IN08" & last_name == "haaften", "trent", middle_name)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up== "SD01" & last_name == "jonhson" & first_name == "dustin", "21935", intent_rep_icpsr)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up == "NJ12" & first_name == "rush", "29923", intent_rep_icpsr)) %>% 
+  tidylog::mutate(intent_rep_icpsr = ifelse(merge_district_dist_up == "PA07" & first_name == "susan" & 
+                                              last_name == "wild", "21763", intent_rep_icpsr)) %>% 
+  tidylog::mutate(last_name = ifelse(last_name == "farenhold" & merge_district_dist_up == "TX27", "farenthold", last_name)) %>% 
+  tidylog::mutate(last_name = ifelse(last_name == "lookout" & merge_district_dist_up == "IN06" & case_id == "161824935", "bookout", last_name))
+
+```
+
+## Merging based on ICPSR ID.
+This joins the cces survey responses with the candidate ideology scores from DIME based on ICPSR values.
+```{r}
+icpsr_merged<- tidylog:: inner_join(cc_for_merge, unique_cands, 
+                                  by = c("intent_rep_icpsr" = "ICPSR2"),
+                                  na_matches = "never") %>% 
+  relocate(intent_rep_icpsr, merge_district_dist_up, year, clean_chosen_rep, first_name, 
+           middle_name, last_name, suffix.x, name, lname, ffname, fname, mname, title, suffix.y)
+```
+
+Here I find those that did not merge in based on the ICPSR score and will use them in the below merge by name to try and match them with the Bonica data by name. 
+```{r}
+icpsr_unmerged <- tidylog::anti_join(cc_for_merge, unique_cands, 
+                                  by = c("intent_rep_icpsr" = "ICPSR2"),
+                                  na_matches = "never") %>% 
+  relocate(intent_rep_icpsr, merge_district_dist_up, year, clean_chosen_rep, first_name, 
+           middle_name, last_name, suffix)
+```
+
+## Merging by name
+Here I create a dataframe with one record per candidate/cycle/district from the DIME data to be used for merging by name below. 
+```{r}
+unique_cands_yearly <- cands.all %>% 
+  mutate(cycle = as.numeric(cycle)) %>% 
+  filter(seat == "federal:house" & cycle %in% 2010:2022) %>% 
+  distinct(bonica.rid, cycle, district, .keep_all = TRUE) %>% ## keep only one row per person/cycle/district
+  ## replace "" strings with NA for merging by names 
+  mutate(across(c(mname, title, suffix), ~ifelse(.x == "", NA, .x))) %>% 
+  select(bonica.rid, cycle, district, name, lname, ffname, fname, mname, title, suffix, party, state, seat, recipient.cfscore, dwdime, dwnom1, dwnom2, ICPSR, ICPSR2) %>% 
+  mutate(across(c(fname, mname, title, suffix, lname), ~str_trim(.))) %>% 
+  filter(name != "ferguson, dana 9062045900")
+```
+
+Now I merge by name/district/year combination with those that were unmerged above by ICPSR
+```{r}
+## Merging by name/district/year
+name_merged <- tidylog::inner_join(icpsr_unmerged, unique_cands_yearly, 
+                                     by = c("merge_district_dist_up" = "district",
+                                         "first_name" = "fname",
+                                         "last_name" = "lname",
+                                         "suffix" = "suffix", 
+                                         "year" = "cycle"))
+```
+
+
+This finds those that didn't join by exact name match and who need some edits or fuzzier join rules for matching them. 
+```{r}
+# finding those that didn't join
+name_unmerged <- tidylog::anti_join(icpsr_unmerged, unique_cands_yearly, 
+                                     by = c("merge_district_dist_up" = "district",
+                                         "first_name" = "fname",
+                                         "last_name" = "lname",
+                                         "suffix" = "suffix",
+                                         "year" = "cycle"))
+```
+
+## Merging by name v2 (looser requirements for by variables)
+By finding instances where there's only one unique combo of last name for a district/year in the ideology data, we can safely merge those observations with the CCES data with a more forgiving match requirement. Put another way, I don't need to worry about strange first/middle names or suffixes. 
+
+```{r}
+unique_cands_yearly <- unique_cands_yearly %>% 
+  group_by(district, lname, cycle) %>% 
+  mutate(dups = n()) %>% 
+  ungroup()
+
+
+safe_to_merge_by_name <- unique_cands_yearly %>% 
+  filter(dups == 1)
+```
+
+
+Capturing those who merge by this modified name merge approach and those who did not. 
+```{r}
+name_merged_v2 <- tidylog::inner_join(name_unmerged, safe_to_merge_by_name, 
+                                     by = c("merge_district_dist_up" = "district",
+                                         "last_name" = "lname",
+                                         "year" = "cycle"))
+name_unmerged_v2 <- tidylog::anti_join(name_unmerged, safe_to_merge_by_name, 
+                                     by = c("merge_district_dist_up" = "district",
+                                         "last_name" = "lname",
+                                         "year" = "cycle"))
+```
+
+So at this point I've progressively narrowed the set down to those that merged by ICPSR, those that merged by name, and those that merged by name with a more forgiving match requirement. Which are as follows: 
+  - ICPSR merged
+  - name_merged
+  - name_merged v2
+
+
+Seeing who didn't merge by name in the above two approaches.  
+```{r}
+name_unmerged_v2 %>% 
+  count(clean_chosen_rep, first_name, middle_name, 
+                        last_name, suffix, merge_district_dist_up) %>%  
+  select(merge_district_dist_up, 
+         clean_chosen_rep, first_name, middle_name, last_name, suffix, n) %>% 
+  arrange(desc(n))
+```
+
+## Merging by name v3 (fuzzy matching)
+Here I take the stragglers who I haven't found matches for using the above techniques and merge using fuzzy name merges. 
+```{r}
+library(fuzzyjoin)
+
+## creating one key variable that is first, middle, last, and suffix in one column. 
+name_unmerged_v2 <- name_unmerged_v2 %>%
+  unite(key, c(first_name, middle_name, last_name, suffix), na.rm=TRUE, remove = FALSE, sep = " ") 
+
+## creating one key variable that is first, middle, last, and suffix in one column. 
+unique_cands_yearly <- unique_cands_yearly %>%
+  tidylog::mutate(mname = ifelse(bonica.rid == "cand149861" & mname == "wesley", NA, mname)) %>% 
+  unite(key, c(fname, mname, lname, suffix), na.rm=TRUE, remove = FALSE, sep = " ") %>% 
+  tidylog::mutate(key = ifelse(bonica.rid == "cand139044", "dorian phibian", 
+                               ifelse( bonica.rid == "cand35125", "gerald jerry hashimoto", key)))
+
+
+## string distance based merge with one manual correction for Mark Arness who gets merged with a completely wrong person. All others look okay based on output below. 
+fuzzy_merged <- stringdist_join(name_unmerged_v2, unique_cands_yearly, mode = "inner",
+                               by = "key",
+                                method = "lv", max_dist = 5) %>% 
+  filter(district == merge_district_dist_up & cycle == year) %>% 
+  filter(clean_chosen_rep!= "Mark Arness" & merge_district_dist_up != "MD05")
+
+as.data.frame((table(fuzzy_merged$key.x, fuzzy_merged$key.y))) %>% filter(Freq >0) %>% arrange(desc(Freq))
+```
+
+## Seeing who didn't merge in still 
+- Todd A. Bloom was a real candidate in WA06, but for some reason is not in the Bonica datasets. Therefore they get excluded below. 
+- Casper stockham is the same person in the data for 2020, which gets merged correctly after the edits above. However, it's unclear they don't retain the same bonicaid and ideology score across these years/elections. I exclude these records for them here. 
+- Ramon Francis Phillips was an independent candidate that doesn't appear to have gotten any votes by the time of the election. https://www.nytimes.com/elections/2012/results/states/texas.html. They get excluded as well. 
+- Joel Azumah has no recipient scores or dwnom scores so they get excluded. 
+
+
+```{r}
+fuzzy_unmerged <- stringdist_join(name_unmerged_v2, unique_cands_yearly, mode = "anti",
+                               by = "key",
+                                method = "lv", max_dist = 5)
+
+fuzzy_unmerged  %>% 
+  count(clean_chosen_rep, first_name, middle_name, 
+                        last_name, suffix, merge_district_dist_up, key) %>%  
+  select(merge_district_dist_up, 
+         clean_chosen_rep, key, first_name, middle_name, last_name, suffix, n) %>% 
+  arrange(desc(n))
+```
+
+## Gathering all of the matched rows. 
+Now I bring all of the matched rows from the survey responses (now that they have the candidate ideology scores attached) back into one dataframe. 
+
+```{r}
+cc_ideology <- bind_rows(icpsr_merged, name_merged, name_merged_v2, fuzzy_merged) 
+```
+
+# Importing ACS data
+```{r message=FALSE, warning=FALSE}
+years <- c(2010, 2015, 2020)
+acs_series <- map_dfr(years, function(year) {
+  get_acs(
+    geography = "county",
+    variables = c("B19083_001" # Gini
+                  ## 'B19013_001', # median household income
+                  ## "B05002_013", # foreign born
+                  ## "B01003_001", # total population
+                  ## "B02001_002", # White alone
+                  ## "B02001_003", # Black or African American alone
+                  ## "B02001_004", # American Indian & Alaska Native alone
+                  ## "B02001_005", #  Asian alone
+                  ## "B02001_006", # Native Hawaiian & Other Pacific Islander alone
+                  ## "B02001_007", # Some other race alone
+                  ## "B02001_008", # Two or more races
+                  ## "B03003_003" # Hispanic or Latino (any race)
+                  ),
+                  year = year,
+                  survey = "acs5"
+    ) %>%
+      mutate(year = year)
+}) %>%
+    arrange(NAME)
+
+
+
+```
+
+
+Because the ACS comes with its own uncertainty with each multi-year
+estimate and I am interested in the change between two periods I follow
+the ACS documentation guidance on calculating my own MOEs for a derived
+proportion (percent foreign born) and then use these to determine if
+there is even a statistically significant difference between the two
+periods.
+
+```{r}
+long_acs2 <- acs_series %>%
+  mutate(variable2 = case_when(variable == "B19083_001" ~ "gini")) %>%
+  select(-variable) %>%
+  rename(variable = variable2) %>%
+  pivot_wider(
+    id_cols = c(GEOID, NAME, year),
+    names_from = c(variable),
+    names_glue = "{variable}_{.value}",
+    values_from = c(estimate, moe)
+  )
+```
+
+
+
+
+# Importing Social capital data
+-   The data used to create this is as follows
+
+    Rupasingha, Anil, Stephan J. Goetz, and David Freshwater. 2006.
+    \"The Production of Social Capital in US Counties.\" *The Journal of
+    Socio-Economics* 35(1):83--101. doi:
+    [10.1016/j.socec.2005.11.001](https://doi.org/10.1016/j.socec.2005.11.001).
+
+    -   religious2014: Number of establishments in Religious
+        organizations (NAICS 813110)
+
+    -   civic2014: Number of establishments in Civic and social
+        associations (NAICS 813410)
+
+    -   business2014: Number of establishments in Business associations
+        (NAICS 813910)
+
+    -   political2014: Number of establishments in Political
+        organizations (NAICS 813940)
+
+    -   professional2014: Number of establishments in Professional
+        organizations (NAICS 813920)
+
+    -   labor2014: Number of establishments in Labor organization (NAICS
+        813930)
+
+    -   bowling2014: Number of establishments in Bowling center (NAICS
+        713950)
+
+    -   recreational2014: Number of establishments in Fitness and
+        Recreational Sports Centers (NAICS 713940)
+
+    -   golf2014: Number of establishments in Golf Courses and Country
+        Clubs (NAICS 713910)
+
+    -   sports2014: Number of establishments in Sports Teams and Clubs
+        (NAICS 711211)
+
+    -   pop2014: Population assn2014: The aggregate for all of above
+        variables divided by population per 1,000 (1st factor) [County
+        Business
+        Patterns](https://www.census.gov/programs-surveys/cbp.html "County Business Patterns data")
+        and can ACS or census denom for population
+
+    -   pvote2012: Voter turnout (2nd factor) (comes from [Dave Leip's
+        Atlas of U.S. Presidential
+        Elections](https://uselectionatlas.org/))
+
+    -   respn2010: Census response rate (3rd factor)
+
+    -   nccs2014: Number of non-profit organizations without including
+        those with an international approach (4th factor) Non-profit:
+        [National Center for Charitable
+        Statistics](http://www.nccs.urban.org/)
+
+    -   sk2014: Social capital index created using principal component
+        analysis using the above four factors (nccs09 is divided by
+        population per 10,000). The four factors are standardized to
+        have a mean of zero and a standard deviation of one, and the
+        first principal component is considered as the index of social
+        capital.
+
+```{r}
+library(readxl)
+sdk14 <- read_xlsx("../data/social capital variables spreadsheet.12-8-17.xlsx")
+sdk09 <- read_xlsx("../data/social_capital.97-05-09.updated8.28.17.xlsx", sheet = "2009")
+sdk05 <- read_xlsx("../data/social_capital.97-05-09.updated8.28.17.xlsx", sheet = "2005")
+
+sdk_all <- left_join(sdk14, sdk09, by= c("FIPS"= "fips")) %>% 
+  left_join(sdk05, by = c("FIPS" = "fips")) %>% 
+  mutate(change_14_9 = sk2014-sk09,
+         change_9_5 = sk09-sk05,
+         change_14_5 = sk2014-sk05,
+         FIPS5 = str_pad(as.character(FIPS), 5, pad = "0"))
+
+```
+
+
+```{r}
+sdk_long <- sdk_all %>% select(FIPS5, County_Name,sk05, sk09, sk2014) %>% 
+  rename(sk14 = sk2014) %>% 
+  pivot_longer(cols = c("sk05", "sk09", "sk14"),
+               names_to= "year",
+               values_to = "social_capital",
+               values_drop_na = TRUE
+               ) %>% 
+  mutate(year = as.numeric(str_replace(year, "sk", "20")))
+
+```
+
+# Importing NHGIS data
+Quick Reference for pdf https://assets.nhgis.org/NHGIS_Time_Series_Tables.pdf codebook 
+```{r, eval = FALSE}
+library(ipumsr)
+
+tst <- get_metadata_nhgis("time_series_tables")
+ts_names <- c("B78",  ## total pop 1980-onwards 
+              "B07", ## 7 cat race vars
+              "A35", ## hispanic/latino flag
+              "A36", ## more detailed hispanic origin
+              "B10", ## persons by hispanic origin by race
+              "AT5", ## foreign/native born
+              "AB9", ## foreign born by region or origin
+              "B84", ## unemployed
+              "B71", ## hh by income categories
+              "B79", ## median hh income
+              "A90", ## fam income categories
+              "AB2", ## median fam income
+              "BD5", ## per-capita income
+              "CL6", ## above/below poverty line counts
+              "C20", ## ratio of income to poverty level
+              "AX6")
+geogs <- c("county")
+
+# For each dataset to include, create a specification with the
+# data tabels and geog levels indicated above
+datasets <- purrr::map(
+  ts_names,
+  ~ tst_spec(
+    name = .x, 
+    geog_levels = "county"
+  )
+)
+
+nhgis_ext <- define_extract_nhgis(
+  description = "Adding AX6, ",
+  time_series_tables   = datasets, 
+  tst_layout = "time_by_row_layout"
+)
+
+nhgis_ext
+```
+
+
+```{r, eval = FALSE }
+submitted <- submit_extract(nhgis_ext)
+is_extract_ready(submitted)
+filepath <- download_extract(submitted, download_dir = "../data/")
+downloaded <- filepath %>% read_nhgis()
+```
+
+Reading in the data that was downloaded in the above API call once. 
+```{r}
+nhgis_data <- read_nhgis("../data/nhgis0007_csv.zip")
+```
+
+Bringing in 2000 level gini estimates from 
+Burkey, Mark L.  "Gini Coefficients for the 2000 Census", March 2006.  https://sites.google.com/a/burkeyacademy.com/main/home/gini-coefficients.
+```{r}
+gini2000 <- read_xls("../data/Ginis for US.xls", sheet = "All Counties") %>% 
+  rename(gini_estimate = Gini,
+         GEOID = CODE) %>% 
+  mutate(year = 2000)
+```
+
+
+```{r}
+conflicted::conflicts_prefer(socviz::`%nin%`)
+nhgis_for_merge <- nhgis_data %>% 
+  filter(YEAR %nin% c("2010", "2020")) %>% 
+  mutate(merge_year = as.numeric(str_sub(YEAR, start=-4))) %>% # Creating merge-able year to align with ACS gini data
+  filter(merge_year %in% c(2000,2010, 2015, 2020)) %>%
+   mutate(GEOID = paste0(STATEFP,COUNTYFP)) %>% 
+  tidylog::left_join(long_acs2, by = c("merge_year" = "year", "GEOID" = "GEOID")) %>% 
+  ## the unmerged here are for 2000, which the ACS data doesn't have GINI coefficients for 
+  tidylog::left_join(gini2000, by = c("merge_year" = "year", "GEOID" = "GEOID")) %>% 
+  mutate(gini_estimate = ifelse(is.na(gini_estimate.x) & !is.na(gini_estimate.y), 
+                                gini_estimate.y, gini_estimate.x)) %>% 
+  select(GEOID, YEAR, merge_year, STATE, STATEFP, COUNTY, COUNTYFP, NAME.x, NAME.y, 
+         gini_estimate, gini_estimate, AB2AA, AT5AB, B78AA, B10AB, B78AA, A35AA, 
+         B78AA, CL6AA, AX6AA, B84AE, B84AA) %>% 
+  mutate(
+      pct_foreign_born = AT5AB / B78AA,
+      pct_black = B10AB/B78AA, # black non-hispanic
+      pct_hispanic = A35AA/B78AA, # pct_hispanic
+      poverty_rate = CL6AA/AX6AA,
+      unemp_rate = B84AE/B84AA
+      ) %>% 
+    group_by(GEOID, COUNTY) %>%
+    arrange(merge_year) %>% 
+    mutate(
+      ppt_fb_change = pct_foreign_born - lag(pct_foreign_born),
+      ppt_hispanic_change = pct_hispanic - lag(pct_hispanic),
+      gini_change = gini_estimate - lag(gini_estimate),
+      poverty_change = poverty_rate - lag(poverty_rate),
+      unemp_rate_change = unemp_rate - lag(unemp_rate),
+      ppt_fb_change_2000 = pct_foreign_born - pct_foreign_born[1],
+      ppt_hispanic_change_2000 = pct_hispanic - pct_hispanic[1],
+      gini_change_2000 = gini_estimate - gini_estimate[1],
+      poverty_change_2000 = poverty_rate - poverty_rate[1],
+      unemp_rate_change_2000 = unemp_rate - unemp_rate[1],
+      lagged_pct_fb = lag(pct_foreign_born),
+      lagged_pct_hispanic = lag(pct_hispanic),
+      lagged_gini = lag(gini_estimate),
+      lagged_poverty = lag(poverty_rate),
+      lagged_unemp = lag(unemp_rate),  
+      pct_fb_2000 = pct_foreign_born[1],
+      pct_hispanic_2000 = pct_hispanic[1],
+      gini_2000 = gini_estimate[1],
+      poverty_2000 = poverty_rate[1],
+      unemp_rate_2000 = unemp_rate[1]
+    ) %>% 
+  ungroup() 
+```
+
+
+# Merging it all together
+Bringing in the CC data that now has ideology scores, and the ACS data to one
+working dataset.
+
+```{r}
+cc_ideology <- cc_ideology %>% 
+  mutate(merge_year = ifelse(year %in% 2006:2010, 2010, 
+                             ifelse(year %in% 2011:2015, 2015, 
+                                    ifelse(year %in% 2016:2020, 2020, year))))
+
+table(cc_ideology$merge_year, cc_ideology$year)
+
+```
+
+```{r}
+wd <- tidylog::left_join(nhgis_for_merge, cc_ideology, 
+                by = c("merge_year" = "merge_year", "GEOID" = "county_fips"))
+
+# the non-merges here are those that had "" empty strings in the original dataset from CES 
+non_merges_from_cc_ideology <- dplyr::anti_join(
+  cc_ideology, 
+  nhgis_for_merge, 
+  by = c("merge_year" = "merge_year", "county_fips" = "GEOID")
+)
+```
+
+I now have a working dataset that has the common content for CCES
+questions (both policy and common demographic questions) from 2006-2021 matched with three 5 year ACS estimate files lining up the above years at the county level. Now to add in the social capital measures. 
+
+
+```{r}
+wd <- wd %>% 
+  mutate(sdk_merge_year = ifelse(year %in% 2006:2010, 2009, 
+                             ifelse(year %in% 2011:2021, 2014, 0)))
+
+wd <- tidylog::left_join(wd, sdk_long, by = c("sdk_merge_year" = "year", "GEOID" = "FIPS5"))
+
+non_merges_social_cap <- anti_join(wd, sdk_long, by = c("sdk_merge_year" = "year", "GEOID" = "FIPS5"))
+
+#The non-matches below are a combination of the year 2000 observations that we aren't expecting to match and the fact that we don't have complete coverage in the number of counties from the CES data 
+
+non_merges_social_cap %>% count(merge_year) 
+
+```
+
+# Cleaning working dataset
+
+## Converting haven labelled data on vars of interest into appropriate data forms
+
+```{r}
+wd <- wd %>%
+  mutate(across(c(gender, educ, race_h, citizen, religion, relig_imp, ownhome, 
+                  has_child, no_milstat, pid3, faminc, employ, no_healthins, union, 
+                  economy_retro, newsint), as_factor, .names = "{col}_fct"))
+
+```
+
+Accounting for some levels of factors created above that are never used.  For instance,
+newsint_fct has NA as a coded level here but no respondents chose that
+answer. So I drop it as a level.
+
+```{r}
+wd <- wd %>% 
+  mutate(across(c(newsint_fct, economy_retro_fct,religion_fct,educ_fct, gender_fct), droplevels))
+```
+
+
+# Summary of final dataset
+At this point, I have a dataset that covers 2010, 2012, 2014, 2016, 2018, 2020 and includes the following: 
+
+* Individual characteristics
+    + gender
+    + education
+    + race/ethnicity
+    + citizenship 
+    + religion and religion importance
+    + home ownership 
+    + parent 
+    + military status 
+    + party identification 
+    + family income 
+    + employment status 
+    + health insurance status 
+    + union membership 
+    + economic retrospective
+    + news interest
+* Individual Policy views
+    + Candidate respondent intends to vote for and the candidate's ideological score 
+* County level estimates of 
+    + % Hispanic
+    + % Foreign born
+    + Change in % Hispanic 
+    + Change in % Foreign born 
+    + Social capital
+    + Median household income
+    + Gini coefficient
+        
+    
+```{r}
+fwd <- wd %>%
+  mutate(
+    economy_retro_fct = fct_rev(economy_retro_fct),
+    economy_retro_fct = fct_relevel(economy_retro_fct, "Not sure", after =
+                                      2),
+    has_child_fct = fct_rev(has_child_fct),
+    union_fct = fct_collapse(union_fct,
+                             "Yes or formerly" = c("Yes, Currently", "Yes, Formerly")),
+    newsint_fct = fct_rev(fct_drop(newsint_fct)),
+    milstat_fct = factor(ifelse(
+      no_milstat == 2,
+      "Self/Family",
+      ifelse(no_milstat == 1, "Neither Self/Family", NA)
+    )),
+    race_h_fct = fct_collapse(race_h_fct, "Other" = c("Other", "Middle Eastern")),
+    region = ifelse(
+      st %in% c("CT", "ME", "MA", "NH", "RI", "VT",
+                "NJ", "NY", "PA"),
+      "Northeast",
+      ifelse(
+        st %in% c(
+          "IL",
+          "IN",
+          "MI",
+          "OH",
+          "WI",
+          "IA",
+          "KS",
+          "MN",
+          "MO",
+          "NE",
+          "ND",
+          "SD"
+        ),
+        "Midwest",
+        ifelse(
+          st %in% c(
+            "DE",
+            "DC",
+            "FL",
+            "GA",
+            "MD",
+            "NC",
+            "SC",
+            "VA",
+            "WV",
+            "AL",
+            "KY",
+            "MS",
+            "TN",
+            "AR",
+            "LA",
+            "OK",
+            "TX"
+          ),
+          "South",
+          ifelse(
+            st %in% c(
+              "AZ",
+              "CO",
+              "ID",
+              "MT",
+              "NV",
+              "NM",
+              "UT",
+              "WY",
+              "AK",
+              "CA",
+              "HI",
+              "OR",
+              "WA"
+            ),
+            "West",
+            NA
+          )
+        )
+      )
+    )
+  ) %>%
+  mutate(
+    med_fam_income_grouped = case_when(
+      AB2AA < 10000  ~ "Less than 10k",
+      AB2AA >= 10000 & AB2AA < 20000 ~ "10k - 20k",
+      AB2AA >= 20000 & AB2AA < 30000 ~ "20k - 30k",
+      AB2AA >= 30000 & AB2AA < 40000 ~ "30k - 40k",
+      AB2AA >= 40000 & AB2AA < 50000 ~ "40k - 50k",
+      AB2AA >= 50000 & AB2AA < 60000 ~ "50k - 60k",
+      AB2AA >= 60000 & AB2AA < 70000 ~ "60k - 70k",
+      AB2AA >= 70000 & AB2AA < 80000 ~ "70k - 80k",
+      AB2AA >= 80000 & AB2AA < 100000 ~ "80k - 100k",
+      AB2AA >= 100000 & AB2AA < 120000 ~ "100k - 120k",
+      AB2AA >= 120000 & AB2AA < 150000 ~ "120k - 150k",
+      AB2AA >= 150000 ~ "150k+"
+    ),
+    med_fam_income_grouped = factor(
+      med_fam_income_grouped,
+      levels = c(
+        "Less than 10k",
+        "10k - 20k",
+        "20k - 30k",
+        "30k - 40k",
+        "40k - 50k",
+        "50k - 60k",
+        "60k - 70k",
+        "70k - 80k",
+        "80k - 100k",
+        "100k - 120k",
+        "120k - 150k",
+        "150k+"
+      )
+    ),
+    ## comparing family incomes to median household income for county. Will add a buffer here of one category on either side of 0 so that those with relatively close to median income aren't measured as different.
+    relative_fam_inc = factor(
+      ifelse(faminc_fct == "Prefer not to say", "Prefer not to say",
+          ifelse((as.numeric(faminc_fct) - as.numeric(med_fam_income_grouped)) <= -2, "Below median",
+             ifelse((as.numeric(faminc_fct) - as.numeric(med_fam_income_grouped)) %in% c(-1, 0, 1), "Near or at median",
+                    ifelse((as.numeric(faminc_fct) - as.numeric(med_fam_income_grouped)) >= 2,"Above median", NA)
+             )
+      )
+      ), levels =c("Near or at median", "Above median", "Below median", "Prefer not to say")
+    )
+  )
+```
+
+
+
+```{r data prep, message=FALSE, warning=FALSE}
+library(gtsummary)
+library(labelled)
+library(sjmisc)
+
+
+fwd <- fwd %>% 
+  filter(social_capital < 10) %>%  ## a few odd social capital values here that are way too big 
+  mutate(age_z = std(age),
+         med_fam_income_z = std(AB2AA),
+         year = factor(year),
+         gini_estimate_z = std(gini_estimate),
+         social_capital_z = std(social_capital),
+         pct_black_z = std(pct_black),
+         poverty_rate_z = std(poverty_rate),
+         unemp_rate_z = std(unemp_rate)) %>% 
+  mutate(across(c(ppt_fb_change, ppt_fb_change_2000, ppt_hispanic_change_2000, 
+                ppt_hispanic_change, lagged_pct_fb, lagged_pct_hispanic, 
+                lagged_gini, lagged_poverty, lagged_unemp, pct_fb_2000, 
+                pct_hispanic_2000, pct_foreign_born, pct_hispanic, 
+                poverty_rate, poverty_change, poverty_change_2000, poverty_2000, 
+                unemp_rate, unemp_rate_change, unemp_rate_change_2000, unemp_rate_2000),
+                ~ .*100
+                )
+         ) %>% 
+  set_variable_labels(
+    region = "Region", 
+    year = "Year",
+    gender_fct = "Sex",
+    age = "Age",
+    educ_fct = "Education",
+    race_h_fct = "Race/Ethnicity",
+    citizen_fct = "Citizenship",
+    relig_imp_fct = "Religion Importance",
+    ownhome_fct = "Home Ownership",
+    has_child_fct = "Parent of young child",
+    milstat_fct = "Military Service",
+    pid3_fct =  "Party ID",
+    employ_fct = "Employment Status",
+    no_healthins_fct = "No Health Insurance",
+    union_fct = "Union Membership",        
+    economy_retro_fct = "Rating of Economy",
+    newsint_fct =  "News Interest",
+    relative_fam_inc = "Relative Family Income",
+    recipient.cfscore = "Pref. Candidate (CFscore)",
+    pct_black =  "% African American/Black",
+    pct_foreign_born = "Prop. Foreign Born",
+    ppt_fb_change =   "Percentage Point Change Foreign Born ",
+    social_capital =   "Social Capital",
+    gini_estimate =   "Gini",
+    unemp_rate =  "Unemployment Rate",
+    poverty_rate =    "Povery Rate",
+    social_capital_z = "Social Capital Std",
+    unemp_rate_z = "Unemployment Rate Std",
+    pct_black_z = "% African American/Black Std",
+    poverty_rate_z = "Poverty Rate",
+    age_z = "Age (Std)",
+    gini_estimate_z = "Gini (Std)",
+    lagged_pct_fb = "% Foreign Born (lag)",
+    lagged_pct_hispanic = "% Hispanic (lag)",
+    lagged_gini = "Gini (lag)",
+    lagged_poverty = "Povery Rate (lag)",
+    lagged_unemp = "Unemp Rate (lag)",
+    pct_fb_2000 = " % Foreign Born (2000)",
+    pct_hispanic_2000 = "% Hispanic (2000)",
+    gini_2000 = "Gini (2000)",
+    poverty_2000 = "Poverty Rate (2000)",
+    unemp_rate_2000 = "Unemployment Rate (2000)",
+    gini_change = "Gini Change",
+    gini_change_2000 = "Gini Change (2000)",
+    poverty_change = "Poverty Rate Change",
+    unemp_rate_change = "Unemp Rate Change",
+    pct_hispanic = "% Hispanic",
+    ppt_hispanic_change = "Ppt Change Hispanic",
+    ppt_hispanic_change_2000 = "Ppt Change Hispanic (2000)",
+    ppt_fb_change_2000 = "Ppt Change Foreign Born (2000)"
+  )
+```
+
+The code below adds the distance from the US-Mexico border for each county. 
+```{r geo data prep, include=FALSE, paged.print=FALSE}
+library(tidycensus)
+library(sf)
+library(tmap)
+
+acs_geom <- get_acs(geography = "county",
+                    year = 2020, 
+                    survey ="acs5",
+                    variables =  c("B01003_001"),
+                    geometry = TRUE, 
+                    cache_table = TRUE) %>% 
+  select(GEOID, NAME, geometry) %>% 
+  st_simplify(dTolerance = 300) 
+
+
+centroids <- st_centroid(acs_geom)
+
+fname <- system.file("../data/tl_2023_us_internationalboundary/tl_2023_us_internationalboundary.shp", package="sf")
+
+borders <- st_read("../data/tl_2023_us_internationalboundary/tl_2023_us_internationalboundary.shp") 
+
+mexico_border <- borders %>% filter(IBTYPE == "M") ## filtering to only mexico border line segments
+
+temp <- st_distance(centroids, mexico_border) ## distance between every county centroid and every mexican border line segment
+
+min_distances <- apply(temp, 1, FUN = min) ## find the line segment the centroid is closest to as the distance for this variable 
+min_dist_named <- bind_cols(acs_geom, min_distances) %>% 
+  rename(meters_to_border = `...4`) %>% 
+  mutate(miles_to_border = meters_to_border*0.0006213712,
+         mtb100s = miles_to_border/100)
+```
+
+```{r bringing in urban and rural county markers}
+urban_vs_rural <- readxl::read_xlsx("../data/NCHSURCodes2013.xlsx")
+
+urban_vs_rural <- urban_vs_rural %>% 
+  mutate(GEOID = str_pad(as.character(`FIPS code`), 5, pad = "0")) %>% 
+  mutate(county_type = ifelse(`2013 code` == 1, "Urban",
+                              ifelse(`2013 code` %in% c(2, 3, 4), "Suburban",
+                                     ifelse(`2013 code` %in% c(5, 6), "Rural", NA)))) %>% 
+  select(GEOID, `2013 code`, county_type)
+
+```
+
+```{r attaching distance from border and rural status}
+
+dist_for_join <- min_dist_named %>% st_drop_geometry()
+
+
+fwd <- fwd %>% 
+  left_join(dist_for_join, by = "GEOID") %>% 
+  left_join(urban_vs_rural, by = "GEOID") %>% 
+  set_variable_labels(
+    mtb100s = "Miles (100s) from Mexico Border",
+    county_type = "County Type") %>% 
+  filter(residency == "5 or more years")
+
+```
+
+# Evaluating missingess 
+
+
+# Saving final dataset
+```{r}
+saveRDS(fwd, "../data/processed/wd.rds")
+```
+
+
+
