@@ -13,7 +13,13 @@ header-includes:
   - \doublespacing
   - \setlength{\parindent}{2em}
   - \setlength{\parskip}{0pt}  
+  - \usepackage{floatrow}
+  - \floatsetup[figure]{capposition=top}
 ---
+
+```{r, echo= FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
 
 # Abstract
 
