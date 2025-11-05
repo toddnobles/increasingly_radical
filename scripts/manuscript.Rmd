@@ -39,9 +39,71 @@ Below I review the evidence for the leading explanations for voters supporting r
 # Background and Literature Review
 
 ## Defining the Reactionary Right
-The turn to the right in the Republican party began in the last quarter of the 20th century and has resulted in the right-most wing of the party being notably further to the right than even their counterparts from 1980. For instance, using DW-Nominate measures of elected official ideologies based on roll call votes, we see that in 1981 the average ideological score for Republicans in the House was approximately 0.3 on a scale from -1 to1 for most liberal to most conservative [@lewisVoteviewPolarizationCongress2023]. By 2023, the mean ideology of House Republicans was 0.5, demonstrating a marked increase in the popularity of more conservative politicians^[Author's replication of their analysis using the code provided by Lewis 2023 to update to the more recent data].  While DW-Nominate data are limited to those who are elected, other data on candidates who ran for the House of Representatives displays similar trends with Republican candidates. Using data from the Database on Ideology, Money and Elections (DW-DIME) which capture candidate’s ideologies based on donor information, we see a similar trend towards a level of right-wing ideology that we have not seen previously in the modern era of politics. The average ideology of Republican candidates for House seats increased from 0.83 in 1980 to 1.24 in 2020^[Note that DW-DIME scores are on a different scale than DW-Nominate scores and are not directly comparable.].
+The turn to the right in the Republican party began in the last quarter of the 20th century and has resulted in the right-most wing of the party being notably further to the right than even their counterparts from 1980. Figure 1 below displays ideological ratings of House members using the traditional DW-Nominate measure and the ideological ratings of House candidates using the CFscore from the DW-DIME Database [@voteviewdatabase; @bonicaDatabaseIdeologyMoney2023].  For instance, using DW-Nominate measures of elected official ideologies based on roll call votes, we see that in 1980 the average ideological score for Republicans in the House was approximately 0.3 on a scale from -1 to 1 for most liberal to most conservative [@lewisVoteviewPolarizationCongress2023]. By 2023, the mean ideology of House Republicans was 0.5, demonstrating a marked increase in the popularity of more conservative politicians^[Author's replication using the code example provided by Lewis 2023 to update to the more recent data included in DIME Database described below]. While DW-Nominate data are limited to those who are elected, other data on candidates who ran for the House of Representatives displays similar trends with Republican candidates. Using data from the Database on Ideology, Money and Elections (DW-DIME) which capture candidates' ideologies based on donor information, we see a similar trend towards a level of right-wing ideology that we have not seen previously in the modern era of politics [@bonicaDatabaseIdeologyMoney2023; @bonicaMappingIdeologicalMarketplace2013]. The average ideology of Republican candidates for House seats increased from 0.83 in 1980 to 1.24 in 2020^[Note that DW-DIME scores are on a different scale than DW-Nominate scores and are not directly comparable.]. Alongside this shift in the Republican party, the Democratic party has also moved further to the left, although based on DW-Nominate scores, much less so. When we turn to the CFScore there is more movement for the Democratic candidates over time, however they still do not reach the extremes of the Republican candidates and the overall story appears to be more of party sorting with the loss of conservative Democrats present in earlier years.
 
-For the purposes of this paper, I define the reactionary right as any candidate who had a DW-DIME score greater than or equal to 1.4. As shown in the chart below, the 80th percentile of candidate ideologies crossed this value in 2010, aligning roughly with the emergence and popularity of the Tea Party Caucus. While exact membership data is difficult to obtain, in 2012, the official membership of the Tea Party Caucus stood at 59 members out of 242, representing 24 percent of the party [@MembershipTeaParty2012]. My motivation for using the 80th percentile rather than the 75th percentile is that the Freedom Caucus, representing the current right most wing of the party, is slightly smaller and as of 2023 had 49 members or 22% of Republicans in the House [@desilverFreedomCaucusLikely2023]. In summary, a DW-DIME CFscore of 1.4 offers a reasonable approximation of the self-identified right-most elected officials and by using such a measure, rather than politicians’ stated ideologies or another metric, I can categorize both those politicians who won elections and had the opportunity to identify with these explicit right groups as well as those who lost elections.
+
+
+
+```{r plot of two ideology measures over time, fig.cap = " House Member and Candidate Ideology 1980-2020", fig.height= 4, fig.width=6, message = FALSE, warning = FALSE}
+library(tidyverse)
+load("../data/dime_recipients_all_1979_2020.rdata") 
+
+cands.all %>% 
+  filter(seat == "federal:house" & party %in% c("100", "200", "328")) %>% 
+  mutate(party_name = ifelse(party == "100", "Dem", 
+                             ifelse(party == "200", "Rep",
+                                    ifelse(party == "328", "Ind", party)))) %>% 
+  distinct(bonica.rid, cycle, .keep_all = TRUE) %>% 
+  mutate(cycle = as.numeric(cycle)) %>% 
+  group_by(cycle, party_name) %>% 
+  summarize(across(c("recipient.cfscore", "dwdime", "dwnom1"), 
+            list(mean = ~ mean(.x, na.rm = TRUE),
+                p10 = ~quantile(.x, p=.1, na.rm = TRUE),
+                p20 = ~quantile(.x, p=.2, na.rm = TRUE),
+                p50 = ~quantile(.x, p=.5, na.rm = TRUE),
+                p80 = ~quantile(.x, p=.8, na.rm = TRUE),
+                p90 = ~quantile(.x, p=.9, na.rm = TRUE)))) %>% 
+  pivot_longer(cols = recipient.cfscore_mean:dwnom1_p90, names_to = c("metric", "statistic"), names_pattern = "(.*)_(.*)") %>%  
+  filter(metric %in% c(
+    "dwnom1",
+    "recipient.cfscore") & party_name %in% c("Rep", "Dem")) %>% 
+  ggplot() + 
+  geom_line(aes(x = cycle, y = value,
+                linetype = statistic,
+                color = party_name)) + 
+  facet_wrap(~metric,
+           labeller = as_labeller(c("dwnom1" = "DW-Nominate",
+                                    "recipient.cfscore" = "CFScore"))) + 
+  scale_color_manual(name = "Party", values = c("Rep" = "red", "Dem" = "blue")) +
+  scale_linetype_manual(name = "Statistic", 
+                        values = c(
+                          mean = "solid",
+                          p10 = "dashed",
+                          p20 = "dotdash",
+                          p50 = "dotted",
+                          p80 = "dotdash",
+                          p90 = "longdash"
+                        ),
+                        labels = c(
+                          mean = "Mean",
+                          p10 = "10th Percentile",
+                          p20 = "20th Percentile",
+                          p50 = "50th Percentile",
+                          p80 = "80th Percentile",
+                          p90 = "90th Percentile"
+                        )) +
+  scale_y_continuous(n.breaks = 10, limits = c(-1.75,1.75)) + 
+  labs(#title = "House Candidate Ideologies 1980-2020",
+       #subtitle = "Mean and Selected Percentiles",
+       y = "Ideology",
+       x = "Election Year") + 
+  theme_minimal()  +
+  theme(panel.spacing = unit(1, "lines"))
+  
+              
+```
+
+For the purposes of this paper, I define the reactionary right as any candidate who had a DW-DIME score greater than or equal to 1.4. As shown in Figure 1 below, the 80th percentile of candidate ideologies crossed this value in 2010, aligning roughly with the emergence and popularity of the Tea Party Caucus. While exact membership data is difficult to obtain, in 2012, the official membership of the Tea Party Caucus stood at 59 members out of 242, representing 24 percent of the party [@MembershipTeaParty2012]. My motivation for using the 80th percentile rather than the 75th percentile is that the Freedom Caucus, representing the current right most wing of the party, is slightly smaller and as of 2023 had 49 members or 22% of Republicans in the House [@desilverFreedomCaucusLikely2023]. In summary, a DW-DIME CFscore of 1.4 offers a reasonable approximation of the self-identified right-most elected officials and by using such a measure, rather than politicians’ stated ideologies or another metric, I can categorize both those politicians who won elections and had the opportunity to identify with these explicit right groups as well as those who lost elections. 
 
 With this working definition of the reactionary right in contemporary US politics, I turn now to review previous theories and explanations for the increasing viability and popularity of more extreme candidates. In their review of the sociology of the radical right, Rydgren outlined a number of demand-side explanations, or those “factors that have changed the interests, emotions, attitudes, and preferences” of voters [@rydgrenSociologyRadicalRight2007]. Here I follow the general categories of explanations they outlined based on earlier evidence from Western Europe’s politics, but modify them to reflect more recent evidence from research focusing on the United States.
 
