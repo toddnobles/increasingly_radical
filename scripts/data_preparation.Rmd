@@ -211,41 +211,65 @@ for (i in seq_along(f)) {
 }
 ```
 
+The CES as citylength in years for 2010, 2014, 2016, 2018
+It has residency at current address for 2010, 2012, 2014, 2016, 2020. 
+
 
 ```{r}
 residency_2010 <- residency_2010 %>% rename(caseid = V100, citylength_1 = V258, residency = CC351) %>% select(-V259) %>% mutate(residency = as_factor(residency))
-residency_2011 <- residency_2011 %>% rename(caseid = V100, citylength_1 = V258, residency = CC307) %>% select(-V259) %>% mutate(residency = as_factor(residency))
 residency_2012 <- residency_2012 %>% rename(caseid = V101, residency = CC351) %>% mutate(residency = as_factor(residency))
-residency_2013 <- residency_2013 %>% rename(residency = CC351) %>% mutate(residency = as_factor(residency))
 residency_2014 <- residency_2014 %>% rename(caseid = V101, residency = CC351) %>% select(-citylength_2) %>% mutate(residency = as_factor(residency))
 residency_2016 <- residency_2016 %>% rename(caseid = V101, residency = CC16_361) %>% select(-citylength_2) %>% mutate(residency = as_factor(residency))
-residency_2017 <- residency_2017 %>% rename(caseid = V101) %>% select(-citylength_2)
 residency_2018 <- residency_2018 %>% select(-citylength_2)
-residency_2019 <- residency_2019 %>% select(-citylength_2)
 residency_2020 <- residency_2020 %>% rename(residency = CC20_361) %>% mutate(residency = as_factor(residency))
-residency_2021 <- residency_2021 %>% rename(residency = CC21_361x) %>% mutate(residency = as_factor(residency))
 
-residency <- bind_rows(residency_2010, residency_2011, residency_2012, residency_2013, residency_2014, residency_2016, residency_2017, residency_2018, residency_2019, residency_2020, residency_2021) %>% 
-  mutate(residency = fct_collapse(residency , "Less than 1 year" = c("1-6 months", "7 to 11 months", "7-11 months", "Less than 1 month", "2 to 6 months")),
-         residency = fct_collapse(residency, "1-2 years" = c("1 to 2 years", "1-2 years")),
-         residency = fct_collapse(residency, "3-4 years" = c("3 to 4 years", "3-4 years")),
-         residency = fct_drop(residency),
-         case_id = as.character(caseid))
+residency <- bind_rows(residency_2010, residency_2012,  residency_2014, residency_2016,  residency_2018,  residency_2020) 
+
+gg_miss_var(residency, facet = year, show_pct = TRUE)
+```
+
+
+```{r}
+# creating primary residency variable as originally described in the CES
+residency <- residency %>% 
+  mutate(
+    case_id = as.character(caseid),
+    residency_at_address = fct_collapse(residency, "Less than 1 year" = c("Less than 1 month", "2 to 6 months","7 to 11 months")),
+         residency_at_address = fct_drop(residency_at_address)
+         )
+
 
 ```
+
 
 
 Reading in the datasets downloaded above 
 ```{r}
 common <-
   readRDS("../data/common.rds")
+```
 
-preferences <-
-  readRDS("../data/preferences.rds")
 
-cc_full_raw <-
-  inner_join(common, preferences, by = c("year", "case_id")) %>% 
-  left_join(residency, by = c("year", "case_id"))
+```{r}
+cc_full_raw <- common %>% 
+  left_join(residency, by = c("year", "case_id")) %>% 
+  mutate(
+    # this measure captures the length of time residing in the city where surveyed and is captured as integer values
+    residency_city = case_when(
+      # catches those who have logically valid values
+      !is.na(citylength_1) & age >=citylength_1 & citylength_1 > 0 ~ citylength_1, # catches those who have valid values
+      .default = NA
+    ),
+    # residency at city is missing for two key years 2012 and 2020. Can impute these with the residency at address which is logically contained within the residency in the same city. Only creating the binary here.
+    residency_city_imputed_gt5 = case_when(
+      !is.na(residency_city) & residency_city >= 5 ~ "5 or more years",
+      is.na(residency_city) & residency_at_address == "5 or more years" ~ "5 or more years",
+      is.na(residency_city) & is.na(residency_at_address) ~ NA,
+      .default = "Less than 5 years"
+    )
+    )
+
+cc_full_raw %>% count(year, residency_city, residency_city_imputed_gt5, residency_at_address ) %>% filter(year %in% c(2010, 2012, 2014, 2016, 2018, 2020)) %>% print(n = 10000)
 ```
 
 ## Creating Filtered CCES
@@ -255,12 +279,12 @@ Filtering to only include years 2010 and later.
 demo_vars <-
   c("gender", "age", "educ","hispanic","race","race_h","citizen","religion",
     "relig_imp","ownhome","has_child","no_milstat","pid3","faminc","employ",
-    "no_healthins","union","economy_retro","newsint", "residency", "citylength_1"
+    "no_healthins","union","economy_retro","newsint", "residency", "citylength_1",
+    "residency_at_address", "residency_city", "residency_city_imputed_gt5"
   )
 
 cc_wd <- cc_full_raw %>% 
   tidylog::filter(year >= 2010) %>% 
-  tidylog::filter(age >= citylength_1 | is.na(citylength_1)) %>% 
   select(year:rvweight_post, demo_vars, approval_rep, 
          vv_turnout_gvm, vv_turnout_pvm,
          intent_rep, intent_rep_party, intent_rep_chosen, rep_current, 
@@ -272,6 +296,10 @@ cc_wd <- cc_full_raw %>%
     st = as.character(as_factor(st, levels = "labels"))
   )
 ```
+
+Current address is the ideal measure here given that some cities spread actross multiple counties. However if I only use residency at current address then I lose the 2018 year. Given the overlap with thes potential residency variables and 
+
+
 
 
 Turns out the ICPSR keys get carried through correctly for CCES data while names do not get transferred for all reps in all instances. See below for instances where there is a valid ICPSR but their name doesn't get transferred in for these years. 
@@ -801,7 +829,7 @@ nhgis_data <- read_nhgis("../data/nhgis0007_csv.zip")
 ```
 
 Bringing in 2000 level gini estimates from 
-Burkey, Mark L.  "Gini Coefficients for the 2000 Census", March 2006.  https://sites.google.com/a/burkeyacademy.com/main/home/gini-coefficients.
+Burkey, Mark L.  "Gini Coefficients for the 2000 Census", March 2006.  https://sites.google.com/a/burkeyacademy.com/main/home/gini-coefficients. These are not actually used in the final manuscript. 
 ```{r}
 gini2000 <- read_xls("../data/Ginis for US.xls", sheet = "All Counties") %>% 
   rename(gini_estimate = Gini,
@@ -946,7 +974,6 @@ At this point, I have a dataset that covers 2010, 2012, 2014, 2016, 2018, 2020 a
     + union membership 
     + economic retrospective
     + news interest
-* Individual Policy views
     + Candidate respondent intends to vote for and the candidate's ideological score 
 * County level estimates of 
     + % Hispanic
@@ -1219,17 +1246,21 @@ fwd <- fwd %>%
   left_join(urban_vs_rural, by = "GEOID") %>% 
   set_variable_labels(
     mtb100s = "Miles (100s) from Mexico Border",
-    county_type = "County Type") %>% 
-  filter(residency == "5 or more years")
+    county_type = "County Type")
 
 ```
 
 # Evaluating missingess 
 
 
-# Saving final dataset
+# Saving final datasets
 ```{r}
-saveRDS(fwd, "../data/processed/wd.rds")
+fwd_res_at_addressgte5 <- fwd %>% filter(residency_at_address == "5 or more years")
+fwd_res_citygte5 <- fwd %>% filter(residency_city >= 5)
+fwd_res_city_imputedgte5 <- fwd %>% filter(residency_city_imputed_gt5 == "5 or more years")
+saveRDS(fwd_res_at_addressgte5, "../data/processed/fwd_res_at_addressgte5.rds")
+saveRDS(fwd_res_citygte5, "../data/processed/fwd_res_citygte5.rds")
+saveRDS(fwd_res_city_imputedgte5, "../data/processed/fwd_res_city_imputedgte5.rds")
 ```
 
 
