@@ -967,123 +967,254 @@ modelsummary(list("7" = m7,
 
 
 
-```{r checking a continuous model of the output }
-# Model List 
-# m1 = individual level covars 
-# m2 = m1 + county_level vars 
-# m3 = m2 + county level vars of interest 
-# m4 = m3 + social capital and immigration interaction 
-# m5 = m3 + social capital and gini interaction 
-# m6 = m3 + social capital and unemployment interaction 
-# m7 = m3 + social capital + unemployment individual interaction 
-# m8 = m3 + faminc and inequality interaction 
-# m9 = m3 + faminc and inequality and immig interaction 
-# m10 = m3 + social capital and immigration and inequaltiy interaction 
-# m11 = m3 + immigration + unemp_rate interaction 
-# m12 = m3 + immigration + unemp individual interaction
+```{r checking some thresholds for robustness model of the output, include = FALSE, eval = FALSE }
+library(broom.mixed) # For cleaning up model outputs
 
-lmer1 <- lmer(recipient.cfscore ~ 
-             gender_fct + 
-             age_z +
-             educ_fct + 
-             relig_imp_fct + 
-             ownhome_fct + 
-             has_child_fct +
-             milstat_fct + 
-             employ_fct + 
-             no_healthins_fct + 
-             union_fct + 
-             economy_retro_fct + 
-             newsint_fct + 
-             relative_fam_inc + 
-             year + 
-             (1 | GEOID), data = reps)
-           
-```
+# 1. Define your thresholds based on your quantiles
+thresholds <- c(1.15, 1.25, 1.40)
 
-```{r m2 and m3, cache = TRUE}
-lmer2 <- update(lmer1, . ~. + 
-               pct_black + 
-               mtb100s + 
-               region + 
-               county_type)
+# 2. Run the models in a loop
+results_list <- list()
 
-lmer3 <- update(lmer2, . ~. + 
-                 social_capital +
-                 gini_estimate100 + 
-                 unemp_rate + 
-                 poverty_rate + 
-                 ppt_fb_change + 
-                 lagged_pct_fb)
+for (t in thresholds) {
+  # Create a temporary dataframe with the specific binary cutoff
+  temp_data <- reps %>%
+    mutate(binary_outcome = ifelse(recipient.cfscore >= t, 1, 0))
+  
+  # Run the model
+  # Note: I'm using your specific glmer settings
+  m_temp <- glmer(binary_outcome ~ 
+                   gender_fct + age_z + educ_fct + relig_imp_fct + 
+                   ownhome_fct + has_child_fct + milstat_fct + 
+                   employ_fct + no_healthins_fct + union_fct + 
+                   economy_retro_fct + newsint_fct + relative_fam_inc + 
+                   year + (1 | GEOID), 
+                 data = temp_data,
+                 family = binomial(link = "logit"),
+                 control = glmerControl(optimizer = "bobyqa", 
+                                        optCtrl = list(maxfun = 1e5)),
+                 nAGQ = 0)
+  
+  # Store the tidied results with a label for the threshold
+  results_list[[as.character(t)]] <- tidy(m_temp, conf.int = TRUE) %>%
+    mutate(threshold = t)
+}
 
+# 3. Combine all results into one table
+all_robustness_results <- bind_rows(results_list)
 
-lmer3.2 <- update(lmer2, . ~. + 
-                 social_capital +
-                 gini_estimate100 + 
-                 unemp_rate + 
-                 poverty_rate + 
-                 ppt_hispanic_change   + 
-                 lagged_pct_hispanic)
+# 4. Filter for a key variable (e.g., age_z) to see if it stays significant
+comparison <- all_robustness_results %>%
+  filter(term == "age_z") %>%
+  select(threshold, estimate, std.error, p.value, conf.low, conf.high)
+
+print(comparison)
+
 
 ```
 
-```{r m4 through m7 socialcapital interactions, cache = TRUE}
-lmer4 <- update(lmer3.2, . ~. + social_capital:ppt_hispanic_change)
-lmer5 <- update(lmer3.2, .~. + social_capital:gini_estimate100)
-lmer6 <- update(lmer3.2, . ~. + social_capital:unemp_rate)
-lmer7 <- update(lmer3.2, .~. + social_capital:employ_fct)
+
+```{r, include = FALSE, eval = FALSE}
+library(broom.mixed)
+library(purrr)
+
+f_m1 <- rightwing_thresh ~ gender_fct + age_z + educ_fct + relig_imp_fct + ownhome_fct + has_child_fct + milstat_fct + employ_fct + no_healthins_fct + union_fct + economy_retro_fct + newsint_fct + relative_fam_inc + year + (1 | GEOID)
+
+f_m2 <- update(f_m1, . ~ . + pct_black + mtb100s + region + county_type)
+
+f_m3.2 <- update(f_m2, . ~ . + social_capital + gini_estimate100 + unemp_rate + poverty_rate + ppt_hispanic_change + lagged_pct_hispanic)
+
+# create the full named list using the base objects
+formulas <- list(
+  "M1"    = f_m1,
+  "M2"    = f_m2,
+  "M3.2"  = f_m3.2,
+  
+  # Social Capital Interactions (m4 - m7)
+  "M4"    = update(f_m3.2, . ~ . + social_capital:ppt_hispanic_change),
+  "M5"    = update(f_m3.2, . ~ . + social_capital:gini_estimate100),
+  "M6"    = update(f_m3.2, . ~ . + social_capital:unemp_rate),
+  "M7"    = update(f_m3.2, . ~ . + social_capital:employ_fct),
+  
+  # Income & Demographic Interactions (m8 - m9)
+  "M8"    = update(f_m3.2, . ~ . + relative_fam_inc:gini_estimate100),
+  "M9"    = update(f_m3.2, . ~ . + relative_fam_inc:ppt_hispanic_change),
+  
+  # Triple Interaction (m10)
+  "M10"   = update(f_m2,   . ~ . + social_capital*ppt_hispanic_change*gini_estimate100 + unemp_rate + poverty_rate),
+  
+  # Hispanic Change Interactions (m11 - m12)
+  "M11"   = update(f_m3.2, . ~ . + ppt_hispanic_change:unemp_rate),
+  "M12"   = update(f_m3.2, . ~ . + ppt_hispanic_change:employ_fct)
+)
+
+## getting thresholds to test, these aren't exactly the same as the ones referenced in text given these are not filtered to distinct candidates, rather this is the distribution of the variable being modeled
+quantile(reps$recipient.cfscore, probs = seq(0,1,by = .1))
+
+thresholds <- c(1.15, 1.25, 1.40, 1.55)
+model_grid <- expand.grid(threshold = thresholds, 
+                          form_name = names(formulas), 
+                          stringsAsFactors = FALSE)
+
+# loop through all model and threshold variations
+all_results <- map_dfr(1:nrow(model_grid), function(i) {
+  curr_t <- model_grid$threshold[i]
+  curr_name <- model_grid$form_name[i]
+  
+  reps_temp <- reps %>% mutate(rightwing_thresh = ifelse(recipient.cfscore >= curr_t, 1, 0))
+  
+  fit <- glmer(formulas[[curr_name]], 
+               data = reps_temp,
+               family = binomial(link = "logit"),
+               control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e5)),
+               nAGQ = 0)
+  
+  tidy(fit, conf.int = TRUE) %>%
+    mutate(threshold = curr_t, model_spec = curr_name)
+})
 ```
 
-```{r m8 through 10, cache = TRUE}
-lmer8 <- update(lmer3.2, . ~. + relative_fam_inc:gini_estimate100)
-lmer9 <- update(lmer3.2, . ~. + relative_fam_inc:ppt_hispanic_change)
-lmer10 <- update(lmer2, . ~. +  social_capital*ppt_hispanic_change*gini_estimate100 + unemp_rate + poverty_rate)
-```
 
-```{r m11 through m12, cache = TRUE}
-lmer11 <- update(lmer3.2, . ~ . + ppt_hispanic_change:unemp_rate)
-lmer12 <- update(lmer3.2, . ~ . + ppt_hispanic_change:employ_fct )
-```
-
-```{r full lmer model tables 1 to 6, warning = FALSE, message = FALSE, cache = TRUE}
-modelsummary(list("1" = lmer1, 
-                  "2" = lmer2, 
-                  "3" = lmer3, 
-                  "3.2" = lmer3.2,
-                  "4" = lmer4, 
-                  "5" = lmer5, 
-                  "6" = lmer6),
-             fmt = 2,
-             estimate = "{estimate}{stars}",
-                           statistic = "conf.int",
-                          coef_map = coef_map_full_tables,
-             title = "Full LMER Models 1-6", 
-             output = "kableExtra", longtable = T) %>% 
-  kable_styling(latex_option= c("scale_down", "repeat_header"), font_size = 8) %>% landscape()
-```
-
-\newpage 
-
-```{r full lmer model tables 7 to 12, warning = FALSE, message = FALSE, cache = TRUE}
-modelsummary(list("7" = lmer7, 
-                  "8" = lmer8, 
-                  "9" = lmer9, 
-                  "10" = lmer10, 
-                  "11" = lmer11, 
-                  "12" = lmer12),
-             fmt = 2,
-             estimate = "{estimate}{stars}",
-                           statistic = "conf.int",
-                           coef_rename = coef_map_full_tables, 
-             title = "Full LMER Models 7-12", 
-             output = "kableExtra", longtable = T) %>% 
-  kable_styling(latex_option= c("scale_down", "repeat_header"), font_size = 8) %>% landscape()
+```{r, include = FALSE, eval = FALSE}
+all_results_exp <- all_results %>% mutate(estimate_exp = exp(estimate),
+                                          conf.low_exp = exp(conf.low),
+                                          conf.high_exp = exp(conf.high))
 ```
 
 
+```{r include = FALSE, eval = FALSE}
+# function for quick plotting of coefs and error bars
+plot_robustness_term <- function(data, target_variable) {
+  
+  # Filter the data for the specific term(s) provided
+  plot_df <- data %>%
+    filter(term %in% target_variable)
+  
+  # Check if the term exists to avoid empty plots
+  if (nrow(plot_df) == 0) {
+    stop("The term '", paste(target_variable, collapse = ", "), "' was not found in the dataset.")
+  }
+
+  ggplot(plot_df, aes(x = model_spec, y = estimate_exp, color = as.factor(threshold))) +
+    # Add point estimates and error bars
+    geom_point(position = position_dodge(width = 0.6), size = 2) +
+    geom_errorbar(aes(ymin = conf.low_exp, ymax = conf.high_exp), 
+                  position = position_dodge(width = 0.6), width = 0.3) +
+    # Reference line at 1 (Null effect for Odds Ratios)
+    geom_hline(yintercept = 1, linetype = "dashed", color = "gray50") +
+    # Facet by term
+    facet_wrap(~term, scales = "free") + 
+    coord_flip() +
+    theme_minimal() +
+    labs(title = paste("Effect of", paste(target_variable, collapse = ", "), "Across Specifications"),
+         subtitle = "Error bars represent 95% Confidence Intervals",
+         x = "Model Specification",
+         y = "Odds Ratio (Exponentiated Estimate)",
+         color = "Threshold") +
+    theme(legend.position = "bottom",
+          panel.grid.minor = element_blank())
+}
+```
+
+```{r include = FALSE, eval = FALSE}
+library(socviz)
+## social capital, removing the M10 and M5 for readability, include those separately below
+plot_robustness_term(all_results_exp %>% filter(model_spec %nin% c("M10", "M5")), "social_capital")
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M10", "M5")), "social_capital")
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M4")), c("social_capital", "social_capital:ppt_hispanic_change"))
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M5")), c("social_capital", "social_capital:gini_estimate100"))
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M6")), c("social_capital", "social_capital:unemp_rate"))
+
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M7")), c("social_capital", "employ_fctPart-Time:social_capital", "employ_fctUnemployed/Laid Off:social_capital", "employ_fctRetired/Disabled:social_capital", "employ_fctOther:social_capital"))
+
+# testing model 10 even though these didn't improve fit in our original model. The cell sizes here for the models get a bit small, particularly for the 1.55 threshold option hence the large uncertainty in estimates 
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M10")), 
+                     c("social_capital", "ppt_hispanic_change", "gini_estimate100", 
+                       "social_capital:ppt_hispanic_change", 
+                       "social_capital:gini_estimate100", 
+                       "ppt_hispanic_change:gini_estimate100",
+                       "social_capital:ppt_hispanic_change:gini_estimate100"))
+```
 
 
-\newpage 
+```{r include = FALSE, eval = FALSE}
+# unemployment specific claims
+plot_robustness_term(all_results_exp,
+                     c("employ_fctPart-Time", "employ_fctUnemployed/Laid Off", "employ_fctRetired/Disabled", "employ_fctOther"))
+
+## unemp rate 
+plot_robustness_term(all_results_exp, c("unemp_rate"))
+
+plot_robustness_term(all_results_exp, "poverty_rate")
+```
+
+
+
+```{r include = FALSE, eval = FALSE}
+all_results_exp %>%
+  filter(grepl(":", term)) %>% 
+  ggplot(aes(x = as.factor(threshold), 
+             y = estimate_exp, 
+             color = model_spec,    # Distinguish models by color
+             group = model_spec)) + # Group by model for dodging
+  # Dodge points so they don't overlap at the same threshold
+  geom_point(size = 2.5, 
+             position = position_dodge(width = 0.5)) + 
+  # Dodge error bars by the same width as points
+  geom_errorbar(aes(ymin = conf.low_exp, ymax = conf.high_exp), 
+                width = 0.2, 
+                position = position_dodge(width = 0.5)) + 
+  geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+  # Use free_y so small interaction effects aren't flattened by large ones
+  facet_wrap(~term, scales = "free_y") + 
+  theme_bw() +
+  labs(title = "Interaction Effects Across Thresholds & Model Specifications",
+       subtitle = "Dodged by Model Specification to show overlapping terms",
+       x = "Binary Cutoff Threshold",
+       y = "Interaction Estimate (Log Odds)",
+       color = "Model Specification") +
+  theme(legend.position = "bottom")
+```
+
+```{r include = FALSE, eval = FALSE}
+# 1. Get a unique list of model names from your results
+model_names <- unique(all_results_exp$model_spec)
+
+
+# 3. Loop through each model and generate a plot
+for (m_name in model_names) {
+  
+  # Filter data for the specific model and remove the Intercept for better scaling
+  plot_data <- all_results_exp %>%
+    filter(model_spec == m_name) %>%
+    filter(term %nin% c("(Intercept)", "sd__(Intercept)", "year2020", "year2016", "year2012", "year2014", "year2010", "regionWest", "regionSouth", "regionNortheast") )
+
+  # Create the plot
+  p <- ggplot(plot_data, aes(x = term, y = estimate_exp, color = as.factor(threshold))) +
+    # Points and whiskers dodged so thresholds don't overlap
+    geom_point(position = position_dodge(width = 0.5), size = 2.5) +
+    geom_errorbar(aes(ymin = conf.low_exp, ymax = conf.high_exp), 
+                  position = position_dodge(width = 0.5), width = 0.3) +
+    # Reference line at 0
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+    # Flip coordinates so variable names are readable on the left
+    coord_flip() +
+    theme_minimal() +
+    labs(title = paste("Robustness Check:", m_name),
+         subtitle = "Comparing Coefficients across Thresholds (1.15, 1.25, 1.4)",
+         x = "Predictor",
+         y = "Estimate (Log Odds)",
+         color = "Threshold") +
+    theme(legend.position = "bottom")
+
+  # Print to the RStudio plot window
+  print(p)
+  
+  # Optional: Save each plot as a PNG
+  # ggsave(filename = paste0("robustness_plots/", m_name, ".png"), plot = p, width = 8, height = 6)
+}
+```
+
 
 \theendnotes
 
