@@ -311,8 +311,7 @@ mwd <- fwd %>% select(final_vars, weight) %>% na.omit() %>%
 
 ```{r creating party dataset}
 reps <- mwd %>% filter(pid3_fct == "Republican") %>% 
-  mutate(rightwing = ifelse(recipient.cfscore >= 1.4, 1, 0),
-         rightwing_1 = ifelse(recipient.cfscore >= ))
+  mutate(rightwing = ifelse(recipient.cfscore >= 1.4, 1, 0))
 ```
 
 \singlespacing
@@ -964,6 +963,124 @@ modelsummary(list("7" = m7,
              output = "kableExtra", longtable = T) %>% 
   kable_styling(latex_option= c("scale_down", "repeat_header"), font_size = 8) %>% landscape()
 ```
+
+
+
+
+```{r checking a continuous model of the output }
+# Model List 
+# m1 = individual level covars 
+# m2 = m1 + county_level vars 
+# m3 = m2 + county level vars of interest 
+# m4 = m3 + social capital and immigration interaction 
+# m5 = m3 + social capital and gini interaction 
+# m6 = m3 + social capital and unemployment interaction 
+# m7 = m3 + social capital + unemployment individual interaction 
+# m8 = m3 + faminc and inequality interaction 
+# m9 = m3 + faminc and inequality and immig interaction 
+# m10 = m3 + social capital and immigration and inequaltiy interaction 
+# m11 = m3 + immigration + unemp_rate interaction 
+# m12 = m3 + immigration + unemp individual interaction
+
+lmer1 <- lmer(recipient.cfscore ~ 
+             gender_fct + 
+             age_z +
+             educ_fct + 
+             relig_imp_fct + 
+             ownhome_fct + 
+             has_child_fct +
+             milstat_fct + 
+             employ_fct + 
+             no_healthins_fct + 
+             union_fct + 
+             economy_retro_fct + 
+             newsint_fct + 
+             relative_fam_inc + 
+             year + 
+             (1 | GEOID), data = reps)
+           
+```
+
+```{r m2 and m3, cache = TRUE}
+lmer2 <- update(lmer1, . ~. + 
+               pct_black + 
+               mtb100s + 
+               region + 
+               county_type)
+
+lmer3 <- update(lmer2, . ~. + 
+                 social_capital +
+                 gini_estimate100 + 
+                 unemp_rate + 
+                 poverty_rate + 
+                 ppt_fb_change + 
+                 lagged_pct_fb)
+
+
+lmer3.2 <- update(lmer2, . ~. + 
+                 social_capital +
+                 gini_estimate100 + 
+                 unemp_rate + 
+                 poverty_rate + 
+                 ppt_hispanic_change   + 
+                 lagged_pct_hispanic)
+
+```
+
+```{r m4 through m7 socialcapital interactions, cache = TRUE}
+lmer4 <- update(lmer3.2, . ~. + social_capital:ppt_hispanic_change)
+lmer5 <- update(lmer3.2, .~. + social_capital:gini_estimate100)
+lmer6 <- update(lmer3.2, . ~. + social_capital:unemp_rate)
+lmer7 <- update(lmer3.2, .~. + social_capital:employ_fct)
+```
+
+```{r m8 through 10, cache = TRUE}
+lmer8 <- update(lmer3.2, . ~. + relative_fam_inc:gini_estimate100)
+lmer9 <- update(lmer3.2, . ~. + relative_fam_inc:ppt_hispanic_change)
+lmer10 <- update(lmer2, . ~. +  social_capital*ppt_hispanic_change*gini_estimate100 + unemp_rate + poverty_rate)
+```
+
+```{r m11 through m12, cache = TRUE}
+lmer11 <- update(lmer3.2, . ~ . + ppt_hispanic_change:unemp_rate)
+lmer12 <- update(lmer3.2, . ~ . + ppt_hispanic_change:employ_fct )
+```
+
+```{r full lmer model tables 1 to 6, warning = FALSE, message = FALSE, cache = TRUE}
+modelsummary(list("1" = lmer1, 
+                  "2" = lmer2, 
+                  "3" = lmer3, 
+                  "3.2" = lmer3.2,
+                  "4" = lmer4, 
+                  "5" = lmer5, 
+                  "6" = lmer6),
+             fmt = 2,
+             estimate = "{estimate}{stars}",
+                           statistic = "conf.int",
+                          coef_map = coef_map_full_tables,
+             title = "Full LMER Models 1-6", 
+             output = "kableExtra", longtable = T) %>% 
+  kable_styling(latex_option= c("scale_down", "repeat_header"), font_size = 8) %>% landscape()
+```
+
+\newpage 
+
+```{r full lmer model tables 7 to 12, warning = FALSE, message = FALSE, cache = TRUE}
+modelsummary(list("7" = lmer7, 
+                  "8" = lmer8, 
+                  "9" = lmer9, 
+                  "10" = lmer10, 
+                  "11" = lmer11, 
+                  "12" = lmer12),
+             fmt = 2,
+             estimate = "{estimate}{stars}",
+                           statistic = "conf.int",
+                           coef_rename = coef_map_full_tables, 
+             title = "Full LMER Models 7-12", 
+             output = "kableExtra", longtable = T) %>% 
+  kable_styling(latex_option= c("scale_down", "repeat_header"), font_size = 8) %>% landscape()
+```
+
+
 
 
 \newpage 
