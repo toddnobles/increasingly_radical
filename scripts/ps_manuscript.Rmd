@@ -30,7 +30,7 @@ header-includes:
 
 # Abstract
 
-Which social and economic factors help explain the recent electoral successes of far-right candidates in the United States? By combining newly available measures of candidate ideology with individual level survey responses and county-level contextual information, I use multi-level logistic models to identify predictors of White Republicans supporting reactionary right politicians in United States House of Representatives elections from 2010 to 2020. I find that residents of counties with higher social capital are more likely to support far-right candidates and that this relationship is strengthened in settings where county-level unemployment is low. Additionally, I find that those residing in counties that have seen an increase in the Hispanic population and those who reside in more economically unequal counties are more likely to support far-right candidates. In combination, these results lend support to the notion that it is not those who have been left behind economically that are moving towards right-wing candidate, but rather it is those in areas that have experienced demographic change and who experience a sense of status threat from their new neighbors who support such candidates.
+Which social and economic factors help explain the recent electoral successes of far-right candidates in the United States? By combining newly available measures of candidate ideology with individual level survey responses and county-level contextual information, I use multi-level logistic models to identify predictors of White Republicans supporting reactionary right politicians in United States House of Representatives elections from 2010 to 2020. I find that residents of counties with higher social capital are more likely to support far-right candidates. Additionally, I find that those residing in counties that have seen an increase in the Hispanic population and those who reside in more economically unequal counties are more likely to support far-right candidates. In combination, the results lend support to the notion that it is not those who have been left behind economically that are moving towards right-wing candidates, but rather it is those in areas that have experienced demographic change and who experience a sense of status threat from their new neighbors who support such candidates.
 
 \newpage
 
@@ -38,7 +38,7 @@ Which social and economic factors help explain the recent electoral successes of
 
 The surprise of Trump’s election sparked a large body of research seeking to understand what factors played a role in his success. From special issues grappling with this surprise, such as Perspectives on Politics’ “Trump: Causes and Consequences” issue to individual works seeking to understand whether economic factors, immigration, social capital, status threat, or exposure to trade shocks, offer the best explanations for the what drew voters to Trump [@greenStigmatizedImmigrantsRadical2016; @sides2016ElectionHow2017; @rodriguez-poseGolfingTrumpSocial2021; @mutzStatusThreatNot2018; @autor2020; @hinojosaojedaTrumpParadoxHow2021]. However, with notable exceptions such as Autor et al. and Christopher Parker, most recent work focused on the United States and political extremism has taken the narrow view of examining the election of Trump in isolation rather than as a notable breakthrough of a growing movement that we can trace back to the Tea Party that emerged during Obama’s presidency and even further back to a rightward shift that began in the Republican party in the 1970s [@autor2020; @parkerStatusThreatMoving2021; @moskowitzParsingPartyPolarization2019]. Treating Trump’s election as a unique event rather than the continuation of a trend limits our ability to study the factors that contribute to success of increasingly reactionary right-wing politicians in the US. Limiting research to this one outcome may help explain some of the conflicting evidence for which factors matter most in predicting whether someone supports such politicians [@morganStatusThreatMaterial2018; @mutzResponseMorganRole2018; @mutzStatusThreatNot2018]. In addition to this focus on a singular electoral outcome, previous research has generally examined the above explanatory factors in isolation with incomplete testing of the theoretically implied interactions between these factors. Here I broaden the scope of the discussion by examining a key period of rightward shift in favor of for more reactionary right-wing candidates in US House of Representatives races from 2010 to 2020 and include a more complete set of relevant controls and interactions of the factors explored in previous researchers’ works.
 
-Of particular interest here is the shift in the Republican party that began largely with the Tea Party that gained prominence during the Obama administration and that largely lives on in the more recent and still influential Freedom Caucus. Both groups defined the rightward bounds of the Republican party during their popularity [@clarkePartySubBrandsAmerican2020]. Coinciding with the emergence of this distinct right-wing of the Republican party we have has seen increasing economic inequality in the United States as well as immigration spreading from traditional cities of reception to new immigrant destinations and areas that have experienced rapid growth in Hispanic populations in recent decades[@masseyNewFacesNew2008; @suro2002]. These trends of unequal economic conditions and the changing immigrant destinations alongside anti-immigrant messaging of the contemporary right movements raise the question of if and how these changes are related. Understanding the relationship between these demographic, economic and political trends is the primary focus of this article.
+Of particular interest here is the shift in the Republican party that began largely with the Tea Party that gained prominence during the Obama administration and that largely lives on in the more recent and still influential Freedom Caucus. Both groups defined the rightward bounds of the Republican party during their popularity [@clarkePartySubBrandsAmerican2020]. Coinciding with the emergence of this distinct right-wing of the Republican party we have has seen increasing economic inequality in the United States as well as immigration spreading from traditional cities of reception to new immigrant destinations and areas that have experienced rapid growth in Hispanic populations in recent decades [@masseyNewFacesNew2008; @suro2002]. These trends of unequal economic conditions and the changing immigrant destinations alongside anti-immigrant messaging of the contemporary right movements raise the question of if and how these changes are related. Understanding the relationship between these demographic, economic and political trends is the primary focus of this article.
 
 In addition to shifting the focus from a singular electoral outcome to a larger trend in political preferences and attitudes of the US public, I further advance our understanding of these processes by linking individual survey responses of preferred political candidates and extensive demographic data with county level economic, population, and social characteristics to move beyond studies that examine aggregate level voting data such as vote totals or margins and link this data to county or similarly local geographies to test the relationships between local contextual factors and votes for Trump. The aggregate predictor to aggregate outcome approach taken in situations with limited data availability, particularly those right after surprise election results, is useful for identifying potential relationships for future research but is susceptible to issues of ecological inference and has the potential to misconstrue the true underlying relationships for voting or political opinions which by definition are individual level outcomes. Recent research such as that conducted by Rodrı́guez-Pose et al. provide an example of such descriptive aggregate work that I build upon here with newly available data sources that allow for a more complete incorporation of individual level data [@rodriguez-poseLeftbehindUnequalPlaces2023]. To this literature, I add a wider set of contextual and individual predictors to simultaneously measure the evidence for the leading theories of what drives individuals towards right-wing candidates that has not previously been analyzed.
 
@@ -121,7 +121,7 @@ cands.all %>%
               
 ```
 
-For the purposes of this paper, I define the reactionary right as any candidate who had a DW-DIME score greater than or equal to 1.4. As shown in Figure 1, the 80th percentile of candidate ideologies crossed this value in 2010, aligning roughly with the emergence and popularity of the Tea Party Caucus. While exact membership data is difficult to obtain, in 2012, the official membership of the Tea Party Caucus stood at 59 members out of 242, representing 24 percent of the party [@MembershipTeaParty2012]. My motivation for using the 80th percentile rather than the 75th percentile is that the Freedom Caucus, representing the current right most wing of the party, is slightly smaller and as of 2023 had 49 members or 22% of Republicans in the House [@desilverFreedomCaucusLikely2023]. In summary, a DW-DIME CFscore of 1.4 offers a reasonable approximation of the self-identified right-most elected officials and by using such a measure, rather than politicians’ stated ideologies or another metric, I can categorize both those politicians who won elections and had the opportunity to identify with these explicit right groups as well as those who lost elections. 
+For the purposes of this paper, I define the reactionary right as any candidate who had a DW-DIME score greater than or equal to 1.4. As shown in Figure 1, the 80th percentile of candidate ideologies crossed this value in 2010, aligning roughly with the emergence and popularity of the Tea Party Caucus. While exact membership data is difficult to obtain, in 2012, the official membership of the Tea Party Caucus stood at 59 members out of 242, representing 24 percent of the party [@MembershipTeaParty2012]. My motivation for using the 80th percentile rather than the 75th percentile is that the Freedom Caucus, representing the current right most wing of the party, is slightly smaller and as of 2023 had 49 members or 22% of Republicans in the House [@desilverFreedomCaucusLikely2023]. In summary, a DW-DIME CFscore of 1.4 offers a reasonable approximation of the self-identified right-most elected officials and by using such a measure, rather than politicians’ stated ideologies or another metric, I can categorize both those politicians who won elections and had the opportunity to identify with these explicit right wing groups as well as those who lost elections. In a series of robustness checks I consider alternative thresholds for defining a far-right candidate based on CFscores of and 1.15, 1.25, and 1.55. 
 
 With this working definition of the reactionary right in contemporary US politics, I turn now to review previous theories and explanations for the increasing viability and popularity of more extreme candidates. In their review of the sociology of the radical right, Rydgren outlined a number of demand-side explanations, or those “factors that have changed the interests, emotions, attitudes, and preferences” of voters [@rydgrenSociologyRadicalRight2007]. Here I follow the general categories of explanations they outlined based on earlier evidence from Western Europe’s politics, but modify them to reflect more recent evidence from research focusing on the United States.
 
@@ -375,7 +375,7 @@ tbl3
 
 # Method
 
-Given the hierarchical structure of these data with individuals grouped in counties, I use mixed effect models with random intercepts for counties to estimate the associations of county level covariates on individuals’ preferences. As discussed above, I define reactionary right politicians as those who had an ideology score greater than or equal to 1.4. The logistic regressions predicting likelihood of supporting a candidate of a reactionary right-wing candidate are as follows: 
+Given the hierarchical structure of these data with individuals grouped in counties, I use mixed effect models with random intercepts for counties to estimate the associations of county level covariates on individuals’ preferences. As discussed above, I define reactionary right politicians as those who had an ideology score greater than or equal to 1.4. I also consider thresholds of 1.15, 1.25, and 1.55. The logistic regressions predicting likelihood of supporting a candidate of a reactionary right-wing candidate are as follows: 
 
 $\text{logitP(}y_i =1 \text{)} = \beta_0 + X_{ij}\beta + Z_j\gamma i + year + \alpha_{j[i]} \text{ for } i=1, \dots, n \text{ and } j = 1, \dots, m$
 
@@ -784,25 +784,30 @@ coef_map_abb_table5 <- build_coef_map_ordered(list(m3,m3.2, m4,m5, m6, m7), mapp
 
 
 # Results
-
 The primary goal here is to examine whether the associations between individual and community characteristics with individuals' ideologies expressed through their intended vote choice for House candidates align with the directions and mechanisms suggested by previous theories outlined above. For reference, a model with individual level predictors only, and a model with control variables for % African American/Black, distance from the border, region in the US, and counties’ population density measured as rural, urban, or suburban are included in the Appendix (see Models 1 and 2). The results in Tables 4 and 5 begin with models that includes all key theoretical variables of interest, namely individuals’ own employment statuses, their ratings of the economy, their family income compared to the county median, the level of social capital in their county of residence, as well as the Gini coefficient, unemployment rate, poverty rate for counties, and finally the percentage point change in foreign born and Hispanic populations as well as the percent of county population that was foreign born and Hispanic in the previous five year period. I turn now to review these results in relation to the proposed mechanisms for these variables discussed earlier. Given the nature of the data available for examining these questions the models presented here are not strict causal models, rather they outline whether the associations between proposed individual and community characteristics and changes in these characteristics are present after we account for various other relevant factors or, as many of the theories outlined above suggest, how these characteristics negate or reinforce one another. With this in mind, below I review the findings from these models. 
 
-First, turning to examine the potential roles of social capital as outlined earlier. Namely, whether social connection at the community level acts as a force that prevents feelings of isolation and anomie and thereby reduces the likelihood of supporting far-right politicians, or if social connection acts as a potential coveted good that people want to protect their networks from intrusion by others and would therefore have a more heightened sense of group threat, or if the sense of security offered by close relations with those around them allows people to welcome newcomers into their community and therefore would be less inclined to vote for politicians who demonize immigrants. First,from Table 4 examining Models 3 and 3.2, which differ only on the measure used for immigration using foreign-born or Hispanic respectively, we see that those living in counties with higher social capital were more likely to support reactionary right candidates, with a one unit increase in social capital increasing the odds of voting for such candidates by a factor of 1.41 based on Model 3.2.
+First, turning to examine the potential roles of social capital as outlined earlier. Namely, whether social connection at the community level acts as a force that prevents feelings of isolation and anomie and thereby reduces the likelihood of supporting far-right politicians, or if social connection acts as a potential coveted good that people want to protect their networks from intrusion by others and would therefore have a more heightened sense of group threat, or if the sense of security offered by close relations with those around them allows people to welcome newcomers into their community and therefore would be less inclined to vote for politicians who demonize immigrants. First, from Table 4 below examining Models 3 and 3.2, which differ only on the measure used for immigration using foreign-born or Hispanic respectively, we see that those living in counties with higher social capital were more likely to support reactionary right candidates, with a one unit increase in social capital increasing the odds of voting for such candidates by a factor of 1.41 based on Model 3.2. This result is robust to different thresholds of defining right-wing candidates, with the effect size increasing as the threshold moves from a CFscore of 1.15 where the OR is 1.11 but is not statistically significant at a p < 0.05 threshold to an OR of 1.30 when the threshold is a CFscore of 1.25, and finally a an OR of 1.36 when the CFscore threshold is 1.55, although this coefficient has a larger standard error given the smaller amount of data to estimate this group and no longer meets a threshold of p<.05. Figure 1A in the Appendix depicts this coefficient across various thresholds and model specifications. Additional threshold comparisons discussed in this section have corresponding figures in the Appendix for reference as noted.^[Additional figures are available upon request.]
 
-Examining the interactions between social capital and other variables, Model 4, tests an interaction between social capital and change in Hispanic population to test whether the relationships between social capital or immigration and support for right wing candidates are moderated by one another. I find no evidence for this interaction improving the fit of the model based on AIC or BIC. Model 5, tests whether local inequality impacts the relationship of social capital and the outcome. Here we see that it is those in more equal settings and with high social capital that were more likely to vote for far-right candidates than those in higher inequality settings. Figure 2 below displays this interaction graphically at representative values of the social capital index and Gini. Model 6, which offers the best fit out of all models considered, shows that those in areas with low unemployment and high social capital were more likely to support right wing candidates. Figure 3 below displays the predicted probabilities at various representative levels of these two variables for ease of interpretation. In Model 7, the interaction between individual level employment status and social capital does not improve model fit based on BIC or AIC metrics and finds no differences in the effect of social capital for individuals of employment types other than the reference of full-time employed. These findings in combination, lend support towards the proposal earlier that it is not those who were left-behind economically and isolated, but those who are in areas with strong social networks and areas that were doing relatively well economically that fear falling down.
+Examining the interactions between social capital and other variables, Model 4, tests an interaction between social capital and change in Hispanic population to test whether the relationships between social capital or immigration and support for right wing candidates are moderated by one another. I find no evidence for this interaction improving the fit of the model based on AIC or BIC. Model 5, tests whether local inequality impacts the relationship of social capital and the outcome. Here we see that it is those in more equal settings and with high social capital that were more likely to vote for far-right candidates than those in higher inequality settings. Figure 2 below displays this interaction graphically at representative values of the social capital index and Gini. This result is robust to different specifications what CFscore is used for determining a far-right candidate. At the 1.15, 1.25, and 1.55 CFscore thresholds, the coefficients for the interaction term are  0.95, 0.97 and 0.98 respectively compared to the 0.94 in the main results. The interaction term is statistically significant at a p < 0.05 threshold for all thresholds except for the 1.55 threshold, which is likely due to limited data to predict an interaction in a model with this many terms at a relatively extreme cutoff percentile for creating the binary outcome. See Figure 2A for a comparison of these thresholds. 
+
+Model 6, which offers the best fit out of all models considered, shows that those in areas with low unemployment and high social capital were more likely to support right wing candidates. However, this result does not hold when considering alternative thresholds of far-right CFscores. Notably the results are not statistically significant at a p < 0.05 threshold using a CFscore threshold of 1.15 or 1.25. When considering the 1.55 threshold, even with the larger uncertainty around the coefficient estimates, the sign of the interaction term shifts to a positive effect, moving from an OR of 0.95 when using a CFscore threshold of 1.4 to an OR of 1.12 when using the 1.55 threshold. This raises the possibility that at the very extreme ideological positions there are other more important motivating factors such as cultural or immigration related issues rather than local unemployment rates. Another possibility is that the finding at a CFscore threshold of 1.4 is a data artifact. See Figure 3A for a visual comparison of these coefficients. 
+
+In Model 7, the interaction between individual level employment status and social capital does not improve model fit based on BIC or AIC metrics and finds no differences in the effect of social capital for individuals of employment types other than the reference of full-time employed. This set of findings around the interactions between community level social capital and other relevant contextual and individual factors, in combination, lend support towards the proposal earlier that it is not those who were left-behind economically and isolated, but those who are in areas with strong social networks and areas that were doing relatively well economically that fear falling down.
 
 The final social capital interaction I consider is in Table 5 in Model 10, which interacts inequality, immigration, and social capital to test whether those in more unequal settings were more reactive to immigration and demonstrate a heightened sense of group threat that leads to supporting candidates who amplify this fear. Adding social capital into this interaction tests whether there is evidence for either of the mechanisms alluded to in prior research but left untested for whether higher social capital acts as a mechanism that makes those feel comfortable in their social standing and able to welcome newcomers into their community or if these dense social networks amplify a sense of in-group versus out-group and potentially provide avenues for a feeling of group threat to spread quickly within a community. From Table 5 below, we see that based on model fit diagnostics, these interactions do not improve model fit despite the statistical significance of the interaction terms which casts doubt on the utility of these as meaningful explanations of individuals' ideologies or candidate preferences. 
 
-Where do the above findings leave our understanding of the role of social connectedness at a community level and likelihood of supporting far-right candidates. Largely, these findings confirm previous research, namely that it is those in areas that were relatively well off economically and in areas with higher levels of community social capital that were most likely to vote for right-wing candidates. This result aligns with previous findings on the role of social capital from Rodríguez-Pose et al. however conflicts with their finding that it is areas with employment decline that were most likely to support, in their case Trump, but in this case right-wing candidates. 
+Where do the above findings leave our understanding of the role of social connectedness at a community level and the likelihood of supporting far-right candidates. Largely, these findings confirm previous research, namely that it is those in areas that were relatively well off economically and in areas with higher levels of community social capital that were most likely to vote for right-wing candidates. This result aligns with previous findings on the role of social capital from Rodríguez-Pose et al. [@rodriguez-poseGolfingTrumpSocial2021]
 
-As detailed earlier, closely related to the notion of disconnectedness is a sense of falling behind others economically and the feelings of injustice and anxieties that this can produce in people that then heightens the appeal of politicians promising a return to better times. Unemployed individuals had odds of voting for a far-right politician that are 1.2 times higher than the full-time employed which is the reference category for this variable. This relationship is consistent across models and while fails to meet a significance threshold of 0.05, is significant at a 0.1 threshold. In the Rating of the Economy variable where the reference category is those who view the economy as having gotten "Much worse" in the year leading up to their survey response, we see again suggestive evidence this time pointing towards those with more positive retrospective ratings of the economy over the past year being slightly more likely to support far-right candidates. Across the full set of models there is little difference in likelihood of supporting far-right candidates between those who have family incomes above or below the median county income relative to those at the median. Taking the associations between each of these various economic factors and supporting far-right candidates, these results suggest that individual unemployment could play some role in driving individuals towards the far-right, however there is little evidence supporting the notions of the associations for those who were relatively worse off or feel the economy has been worse were any more or less likely to support far-right candidates.
+As detailed earlier, closely related to the notion of disconnectedness is a sense of falling behind others economically and the feelings of injustice and anxieties that this can produce in people that then heightens the appeal of politicians promising a return to better times. Regarding the contextual measures of economic well-being and whether those in places that have been left-behind were more likely to support right-wing candidates, I find little evidence for this mechanism. Across models county-level unemployment and poverty rate were both negatively associated with likelihood of supporting right-wing candidates. The results for both of these are robust to threshold cutoff choices. For instance, for poverty rate, the negative relationship increases in magnitude as the CFscore becomes more extreme, where for higher thresholds of 1.4 and 1.55 it meets a p < 0.05 threshold of significance (See Figure 4A). While there is not support for this left-behind notion at the community level, there is support across models for the notion of "fearing the fall" discussed earlier in that those residing in more unequal communities, based on county level Gini, were more likely to support far-right candidates (See Figure 5A). However, turning to Model 8 in Table 5, there is not strong evidence that the effect of living in an unequal community operates differently for those of different income levels.
 
-Regarding the contextual measures of economic well-being and whether those in places that have been left-behind were more likely to support right-wing candidates, I find little evidence for this mechanism. Across models county-level unemployment and poverty rate were both negatively associated with likelihood of supporting right-wing candidates. Relatedly, turning to Model 8 in Table 5, there is not strong evidence in support of the notion that it is those who were relatively well off but who reside in unequal communities who were fearful of falling down who were more likely to support right-wing candidates.
+Turning to the individual level economic factors, unemployed individuals had odds of voting for a far-right politician that are 1.2 times higher than the full-time employed which is the reference category for this variable. This relationship is consistent across models and while fails to meet a significance threshold of p< 0.05, is significant at a 0.1 threshold. Additionally, this finding sees a similar ladder effect in coefficient estimate increasing as the CFscore thresholds become more extreme from 1.15 through 1.55 cutoffs indicating that this individual left-behind feeling is a relevant predictor (See Figure 6A). In the Rating of the Economy variable where the reference category is those who view the economy as having gotten "Much worse" in the year leading up to their survey response, we see again suggestive evidence this time pointing towards those with more positive retrospective ratings of the economy over the past year being slightly more likely to support far-right candidates. Although this effect is not distinguishable from zero for the lower CFscore thresholds (See Figure 7A).
 
-Turning to testing theories for the role of immigration in heightening a sense of group threat for respondents under various conditions. From Model 3, when measured as change in foreign born percentage of county population within the last five years, immigration shows no effect on favorability of far-right candidates. However, there is evidence across models that those in areas with a higher baseline level of foreign-born residents were more likely to support far-right candidates. However, given recent findings from Abrajano and Hajnal that Whites conflate change in Hispanic population as change in immigrant population and largely conceive of immigration as Hispanic population change, I also examine immigration as measured by the change in Hispanic population between periods [@abrajano2015]. These results are shown in Model 3.2. Comparing these models, while White respondents seem unaffected by the change in foreign born population, there is consistent evidence across models of evidence of White residents in counties that have seen an increase in Hispanic population over the last five years were more likely to support far-right candidates. Given this association and prior findings, I measure immigration as Hispanic population change in the models here. 
+Across the full set of models there is little difference in likelihood of supporting far-right candidates between those who have family incomes above or below the median county income relative to those at the median. Taking the associations between each of these various economic factors and supporting far-right candidates, these results suggest that individual unemployment could play some role in driving individuals towards the far-right, however there is little evidence supporting the notions of the associations for those who were relatively worse off or feel the economy has been worse were any more or less likely to support far-right candidates.
 
-As discussed above, the interaction between immigration and social capital in Model 4 was found to reduce model fit, challenging the idea that the impact of immigration on respondents’ views of right-wing candidates was impacted by the social capital of the region they reside in. Similarly, the relationship of immigration on likelihood of supporting right-wing candidates did not vary meaningfully for those at different levels of economic standing in their community based on the results from Model 9, nor do the interactions between immigration and individuals’ unemployment status or county-level unemployment rates improve model fit (see Models 11 and 12). Finally, considering the three-way interaction between social capital, immigration, and inequality included in Model 10, including these interactions does not improve the model fit. In summary, these results concerning immigration and the various potential moderating relationships of individual and contextual level variables supports the posited mechanism that Whites in areas that have experienced an increase in Hispanic population were more likely to support right-wing candidates due to a sense of group status threat, however there is not strong evidence that this relationship was meaningfully moderated by individuals’ economic standing, the economic conditions of the region, or the level of social capital in a community.
 
+Turning to testing theories for the role of immigration in heightening a sense of group threat for respondents under various conditions. From Model 3, when measured as change in foreign born percentage of county population within the last five years, immigration shows no effect on favorability of far-right candidates. However, there is evidence across models that those in areas with a higher baseline level of foreign-born residents were more likely to support far-right candidates. However, given recent findings from Abrajano and Hajnal that Whites conflate change in Hispanic population as change in immigrant population and largely conceive of immigration as Hispanic population change, I also examine immigration as measured by the change in Hispanic population between periods [@abrajano2015]. These results are shown in Model 3.2. Comparing these models, while White respondents seem unaffected by the change in foreign born population, there is consistent evidence across models of evidence of White residents in counties that have seen an increase in Hispanic population over the last five years were more likely to support far-right candidates. Given this association and prior findings, I measure immigration as Hispanic population change in the models here. This effect is robust to various thresholds of defining far-right candidates and increases in magnitude as the threshold for being defined as a far-right candidate increases (see Figure 8A). 
+
+As discussed above, the interaction between immigration and social capital in Model 4 was found to reduce model fit, challenging the idea that the impact of immigration on respondents’ views of right-wing candidates was impacted by the social capital of the region they reside in. Similarly, the relationship of immigration on likelihood of supporting right-wing candidates did not vary meaningfully for those at different levels of economic standing in respondents' communities based on the results from Model 9. The effect of immigration was not notably different for those who were unemployed versus those who were employed based on the results from Model 12. Considering the results from Model 11 which examines whether the effect of immigration is different at different levels of county-level unemployment rates, there is little evidence for this moderating effect based on the coefficient estimates and model fit diagnostics. Finally, considering the three-way interaction between social capital, immigration, and inequality included in Model 10, including these interactions does not improve the model fit. In summary, these results concerning immigration and the various potential moderating relationships of individual and contextual level variables support the posited mechanism that Whites in areas that have experienced an increase in Hispanic population were more likely to support right-wing candidates due to a sense of group status threat, however there is not strong evidence that this relationship was meaningfully moderated by individuals’ economic standing, the economic conditions of the region, or the level of social capital in a community.
 
 \newpage
 \singlespacing
@@ -898,27 +903,19 @@ pm6 <- plot_model(m6, type = "eff",
 pm5
 ```
 
-\newpage
-
-```{r,  warning = FALSE, message = FALSE}
-pm6
-```
-
-
 \doublespacing 
 
 # Discussion
 
-This work focuses on the factors that explain individuals’ preferences for far-right wing politicians in the US. In examining the evidence for how social, economic, and demographic factors relate to individuals’ likelihood to support these far-right candidates I find that there is moderate evidence in support for those who were actively unemployed to be more likely to support far-right candidates. I confirm previous findings from other researchers that community level social capital is an important predictor of support for these candidates. However, due to data limitations, I am unable to determine if it is those in the communities with high levels of social capital who were themselves well connected to these networks or if we are seeing a response from those who were in the presence of strong networks but were themselves excluded from them and were therefore still feeling disconnected despite living in areas with higher levels of connectedness. Future work would benefit from identifying new data sources to capture this information. However, contrary to prior research by Rodríguez-Pose et al., I find that this relationship is strengthened in in areas with lower levels of unemployment [@rodriguez-poseGolfingTrumpSocial2021].
+This work focuses on the factors that explain individuals’ preferences for far-right wing politicians in the US. In examining the evidence for how social, economic, and demographic factors relate to individuals’ likelihood to support these far-right candidates I find that there is moderate evidence in support for those who were actively unemployed to be more likely to support far-right candidates. I confirm previous findings from other researchers that community level social capital is an important predictor of support for these candidates. However, due to data limitations, I am unable to determine if it is those in the communities with high levels of social capital who were themselves well connected to these networks or if we are seeing a response from those who were in the presence of strong networks but were themselves excluded from them and were therefore still feeling disconnected despite living in areas with higher levels of connectedness. Future work would benefit from identifying new data sources to capture this information. 
 
-Additionally, I find that residents of counties with higher social capital were more likely to support far-right candidates and that this relationship is strengthened in settings where county-level unemployment is low. Additionally, I find that those residing in counties that saw an increase in the Hispanic population and those who resided in more economically unequal counties were more likely to support far-right candidates. In combination, these results lend support to the notion that it is not those who have been left behind economically that were moving towards right-wing candidate, but rather it was those in areas that have experienced demographic change and who experience a sense of status threat from their new neighbors in settings where they can fall down the economic ladder that were most likely to support far-right candidates.
+Additionally, I find that residents of counties with higher social capital were more likely to support far-right candidates. Additionally, I find that those residing in counties that saw an increase in the Hispanic population and those who resided in more economically unequal counties were more likely to support far-right candidates. In combination, these results lend support to the notion that it is not those who have been left behind economically that were moving towards right-wing candidate, but rather it was those in areas that have experienced demographic change and who experience a sense of status threat from their new neighbors in settings where they can fall down the economic ladder that were most likely to support far-right candidates. 
 
 Future work would benefit from testing various time frames of changes in demographic and economic conditions, similar to the approaches used by Autor et al. and Rodríguez-Pose et al.  [@autor2020;@rodriguez-poseLeftbehindUnequalPlaces2023]. It may be that people form their views based on earlier experiences or that it is changes in their communities over longer periods of time that shape their attitudes and preferences more so than the most immediate or recent change in the last five year as used here. 
 
 As mentioned earlier, studying ideology and elections comes with a suite of selection and filtering processes that determine when candidates of certain ideological leanings run and where they choose to run for office. This article uses DW-DIME scores, rather than DW-NOMINATE scores to account for some of this selection. That is, I examine support for not only candidates who won elections, but all the candidates that ran for election. However, to my knowledge there is no data source that captures the prior stages of candidate and voter decision making that determine which candidates choose to run as well as when and where they do so. Future work is needed to create alternative measures of individual voter ideology that go beyond a self-rating scale and allow for comparisons over time perhaps comparing views on a basket of policy issues over time. With additional time and some standardization, the CES may be a data source for the creation of such a scale. For now, in this work I focused on trying to understand in what contexts do people of various characteristics and circumstances support more radical candidates. 
 
 Future research would also benefit from examining not just intra-county inequality but test the various geographic scales at which people may be comparing themselves economically. We know that social lives and the environments that people spend their time in throughout the day to not perfectly align with administrative boundaries such as counties, so as more detailed data becomes available for linking individuals, their preferences and attitudes to the social environments that they actually spend their time in we will be able to better understand the role of context on shaping attitudes. Closely related to this suggestion of working for collecting data that provides better measurement of lived environments, incorporating more detailed information on where individuals obtain their information about the world in terms of media consumption and news sources will be key for fully understanding the growing popularity of the right-wing in the US. There is evidence that media such as Fox News pushes people towards more conservative views and there is evidence around local context becoming more salient for shaping views when highlighted in the media [@dellavignaFoxNewsEffect2007; @hopkinsPoliticizedPlacesExplaining2010; @martinBiasCableNews2017]. In the models above I control for self-reported levels of news interest from respondents but the national CES data do not contain details on the specific media sources that respondents use or consume.
-
 
 Finally, conducting surveys that ask respondents not only their demographic information and their policy views, but also their perceptions of conditions in their local community and nationally would allow further testing of whether it is a change in objective conditions or a change in perceptions that is not supported by the objective conditions people are surrounded by that is motivating these preferences. This will shed light on the social and psychological processes at play. Additionally, it will help answer a persistent question in this literature of whether individual policy preferences and political attitudes are rooted in objective conditions and we should operationalize experiences based on these objective conditions in studies or whether we simply need to account for perceptions which may be largely disconnected from local objective conditions and heavily influenced by media consumption. The answer to these questions requires new data and potentially new modeling techniques for those interested in countering a rightward shift in politics. This need for improved data is not simply for academic curiosity. If research identifies that perceptions largely track objective conditions and those conditions push people further to radical reactionary views, then for those who seek to counteract this movement improving those conditions is the prescription for slowing the rise of the radical right. However, if perceptions largely do not track objective conditions, then those who seek to undercut this rising tide of right-wing support by investing in improving objective conditions may be disappointed in the results.
 
@@ -967,7 +964,7 @@ modelsummary(list("7" = m7,
 ```
 
 
-```{r, include = FALSE, eval = FALSE}
+```{r, warning = FALSE, message = FALSE, cache = TRUE, include = FALSE, eval = TRUE  }
 library(broom.mixed)
 library(purrr)
 
@@ -1001,8 +998,10 @@ formulas <- list(
   "M12"   = update(f_m3.2, . ~ . + ppt_hispanic_change:employ_fct)
 )
 
-## getting thresholds to test, these aren't exactly the same as the ones referenced in text given these are not filtered to distinct candidates, rather this is the distribution of the variable being modeled
-quantile(reps$recipient.cfscore, probs = seq(0,1,by = .1))
+## examining thresholds to test, these aren't exactly the same as the ones referenced in text given these are not filtered to distinct candidates, rather this is the distribution of the variable being modeled
+quantile(reps$recipient.cfscore, probs = seq(0,1,by = .1), na.rm = TRUE)
+temp <- fwd %>% filter(race_h_fct == "White" & pid3_fct == "Republican") %>% group_by(clean_chosen_rep) %>% slice(1) %>% ungroup() 
+quantile(temp$recipient.cfscore, probs = seq(0,1,by = .1), na.rm = TRUE)
 
 thresholds <- c(1.15, 1.25, 1.40, 1.55)
 model_grid <- expand.grid(threshold = thresholds, 
@@ -1028,29 +1027,33 @@ all_results <- map_dfr(1:nrow(model_grid), function(i) {
 ```
 
 
-```{r, include = FALSE, eval = FALSE}
+```{r, warning = FALSE, message = FALSE, cache = TRUE}
 all_results_exp <- all_results %>% mutate(estimate_exp = exp(estimate),
                                           conf.low_exp = exp(conf.low),
                                           conf.high_exp = exp(conf.high))
 ```
 
 
-```{r include = FALSE, eval = FALSE}
-# function for quick plotting of coefs and error bars
+```{r, warning = FALSE, message = FALSE}
 plot_robustness_term <- function(data, target_variable) {
   
-  # Filter the data for the specific term(s) provided
+  # 1. Filter the data
   plot_df <- data %>%
     filter(term %in% target_variable)
   
+  # 2. Fix the Model Order
+  # This converts the model names to a factor. 
+  # 'unique(data$model_spec)' ensures they follow the order they were created (M1 -> M12).
+  # We use 'rev()' because coord_flip() reverses the display order on the Y-axis.
+  plot_df <- plot_df %>%
+    mutate(model_spec = factor(model_spec, levels = rev(unique(data$model_spec))))
+  
+  # 3. Plot
   ggplot(plot_df, aes(x = model_spec, y = estimate_exp, color = as.factor(threshold))) +
-    # Add point estimates and error bars
     geom_point(position = position_dodge(width = 0.6), size = 2) +
     geom_errorbar(aes(ymin = conf.low_exp, ymax = conf.high_exp), 
                   position = position_dodge(width = 0.6), width = 0.3) +
-    # Reference line at 1 (Null effect for Odds Ratios)
     geom_hline(yintercept = 1, linetype = "dashed", color = "gray50") +
-    # Facet by term
     facet_wrap(~term, scales = "free") + 
     coord_flip() +
     theme_minimal() +
@@ -1064,12 +1067,14 @@ plot_robustness_term <- function(data, target_variable) {
 }
 ```
 
-```{r include = FALSE, eval = FALSE}
+```{r fig.width=8, fig.height=6, warning = FALSE, message = FALSE}
 library(socviz)
 ## social capital, removing the M10 and M5 for readability, include those separately below
-plot_robustness_term(all_results_exp %>% filter(model_spec %nin% c("M10", "M5")), "social_capital")
-plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M10", "M5")), "social_capital")
+plot_robustness_term(all_results_exp %>% filter(model_spec %nin% c("M10", "M5")), "social_capital") + labs(title = "Figure 1A: Effect of Social Capital Across Thresholds and Specifications", caption ="Model 5 and Model 10 excluded for legibility.")
 ## Here we see that ladder effect where the effect is stronger as you move to more radical threshold values
+
+
+
 ```
 
 
@@ -1079,20 +1084,41 @@ plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M4")), c("soc
 ```
 
 
-```{r include = FALSE, eval = FALSE}
-plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M5")), c("social_capital", "social_capital:gini_estimate100"))
+```{r, fig.width=8, fig.height=6, include = TRUE}
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M5")), c("social_capital", "social_capital:gini_estimate100")) + labs(title = str_wrap("Figure 2A: Effect of Social Capital and Interaction with Gini for Model 5"))
 ## largely similar effect sizes for the three thresholds
 ```
 
 
-```{r include = FALSE, eval = FALSE}
-plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M6")), c("social_capital", "social_capital:unemp_rate"))
-## Using this threshold we see there is something unique about the 1.4 group here where the sign shifts indicating that this is a meaningful difference in predicting support for further right. I don't really trust the 1.55 estimates given the lack of data for that threshold (it's a vary extreme case)
+```{r, fig.width=8, fig.height=6, include = TRUE}
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M6")), c("social_capital", "social_capital:unemp_rate")) + labs(title = str_wrap("Figure 3A: Effect of Social Capital and the Interaction with Unemployment Rate in Model 6"))
+## Using this threshold we see there is something unique about the 1.4 group here where the sign shifts indicating that this is a meaningful difference in predicting support for further right.
 ```
 
 
 ```{r include = FALSE, eval = FALSE}
-plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M7")), c("social_capital", "employ_fctPart-Time:social_capital", "employ_fctUnemployed/Laid Off:social_capital", "employ_fctRetired/Disabled:social_capital", "employ_fctOther:social_capital"))
+# no convergence issues 
+reps_155 <- reps %>% mutate(rightwing_thresh = ifelse(recipient.cfscore >= 1.55, 1, 0))
+m6_1.55 <- glmer(rightwing_thresh ~ gender_fct + age_z + educ_fct + relig_imp_fct + 
+                   ownhome_fct + 
+    has_child_fct + milstat_fct + employ_fct + no_healthins_fct + 
+    union_fct + economy_retro_fct + newsint_fct + relative_fam_inc + 
+    year + (1 | GEOID) + pct_black + mtb100s + region + county_type + 
+    social_capital + gini_estimate100 + unemp_rate + poverty_rate + 
+    ppt_hispanic_change + lagged_pct_hispanic + social_capital:unemp_rate, data = reps_155,
+             family = binomial(link = "logit"),
+             control = glmerControl(optimizer = "bobyqa",
+                                    optCtrl = list(maxfun = 1e5)), 
+             nAGQ = 0)
+
+
+
+
+```
+
+
+```{r include = FALSE, eval = FALSE}
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M7")), c("social_capital",  "employ_fctUnemployed/Laid Off:social_capital"))
 
 # testing model 10 even though these didn't improve fit in the original model. The cell sizes here for the models get a bit small, particularly for the 1.55 threshold option hence the large uncertainty in estimates 
 plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M10")), 
@@ -1103,30 +1129,85 @@ plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M10")),
                        "social_capital:ppt_hispanic_change:gini_estimate100"))
 ```
 
-
-```{r include = FALSE, eval = FALSE}
-# unemployment specific claims
-plot_robustness_term(all_results_exp,
-                     c("employ_fctUnemployed/Laid Off"))
-## again see ladder effect of larger coef for individual unemployment when predicting more radical politicians, but never reaches .05 threshold
-
+```{r include = TRUE, fig.width=8, fig.height=6}
 ## unemp rate 
-plot_robustness_term(all_results_exp, c("unemp_rate"))
-
-plot_robustness_term(all_results_exp, "poverty_rate")
+plot_robustness_term(all_results_exp, c("unemp_rate", "poverty_rate")) + labs(title = str_wrap("Figure 4A: Effect of Unemployment and Poverty Rates Across Specifications"))
 ```
 
 
+```{r include = TRUE, fig.width = 8, fig.height = 6}
+plot_robustness_term(all_results_exp, c("gini_estimate100")) + labs(title = str_wrap("Figure 5A: Effect of Inequality (Gini*100) Across Specifications"))
+## again we see this ladder effect. with increasing point estimates as inequality increases. 
+```
+
+```{r, fig.width=8, fig.height=6, include = TRUE}
+# unemployment specific claims
+plot_robustness_term(all_results_exp,
+                     c("employ_fctUnemployed/Laid Off")) + labs(title = str_wrap("Figure 6A: Effect of Individual Unemployment Status Across Specifications"))
+## again see ladder effect of larger coef for individual unemployment when predicting more radical politicians, but never reaches .05 threshold
+```
+
+
+```{r, include = FALSE }
+plot_robustness_term(all_results_exp %>% filter(model_spec %in% c("M8")), c("relative_fam_incAbove median:gini_estimate100", "relative_fam_incBelow median:gini_estimate100", "relative_fam_incPrefer not to say:gini_estimate100"))
+```
+
+```{r, fig.width=8, fig.height=7, include = TRUE}
+## relative rating of the economy 
+plot_robustness_term(all_results_exp, c("economy_retro_fctMuch better")) + labs(title = "Figure 7A: Positive Retrospective Rating of Economy Across Specifications")
+```
+
+
+```{r, fig.width=8, fig.height=6, include = FALSE}
+plot_robustness_term(all_results_exp %>% filter(model_spec %nin% c("M8")), c("relative_fam_incAbove median", "relative_fam_incBelow median", "relative_fam_incPrefer not to say"))
+```
+
+
+```{r include = TRUE, fig.height = 6, fig.width = 8}
+plot_robustness_term(all_results_exp, c("ppt_hispanic_change")) + labs(title = str_wrap("Figure 8A: Effect of Hispanic Population Change Across Specifications"))
+## again we see this sort of ladder effect where they're largely overlapping but increasing in the point estimate for more extreme candidates
+```
+
 ```{r include = FALSE, eval = FALSE}
-plot_robustness_term(all_results_exp, c("ppt_hispanic_change"))
+plot_robustness_term(all_results_exp, c("ppt_hispanic_change", "social_capital:ppt_hispanic_change"))
 ## again we see this sort of ladder effect where they're largely overlapping but increasing in the point estimate for more extreme candidates
 ```
 
 
+
+
 ```{r include = FALSE, eval = FALSE}
-plot_robustness_term(all_results_exp, c("gini_estimate100"))
-## again we see this ladder effect. with increasing point estimats as inequality increases. 
+plot_robustness_term(all_results_exp %>% filter(model_spec == "M9"),
+                     c("relative_fam_incAbove median:ppt_hispanic_change",     
+                        "relative_fam_incBelow median:ppt_hispanic_change",     
+                        "relative_fam_incPrefer not to say:ppt_hispanic_change"))
 ```
+
+
+```{r, eval = FALSE, include = FALSE }
+plot_robustness_term(all_results_exp %>% filter(model_spec == "M11"), c(
+  "unemp_rate", "ppt_hispanic_change", "unemp_rate:ppt_hispanic_change"))
+
+m11_1.55 <- glmer(rightwing_thresh ~ gender_fct + age_z + educ_fct + relig_imp_fct + ownhome_fct + 
+    has_child_fct + milstat_fct + employ_fct + no_healthins_fct + 
+    union_fct + economy_retro_fct + newsint_fct + relative_fam_inc + 
+    year + (1 | GEOID) + pct_black + mtb100s + region + county_type + 
+    social_capital + gini_estimate100 + unemp_rate + poverty_rate + 
+    ppt_hispanic_change + lagged_pct_hispanic + unemp_rate:ppt_hispanic_change, data = reps_155,
+             family = binomial(link = "logit"),
+             control = glmerControl(optimizer = "bobyqa",
+                                    optCtrl = list(maxfun = 1e5)), 
+             nAGQ = 0)
+plot_model(m11_1.55, type = "eff", 
+                  terms = c("unemp_rate", "ppt_hispanic_change"), bias_correction = TRUE)
+```
+
+
+```{r, include = FALSE, eval = FALSE }
+plot_robustness_term(all_results_exp %>% filter(model_spec == "M12"), c("employ_fctUnemployed/Laid Off:ppt_hispanic_change"))
+```
+
+
 
 ```{r include = FALSE, eval = FALSE}
 all_results_exp %>%
@@ -1218,8 +1299,10 @@ view_robustness_table <- function(data, target_terms) {
 
 
 ```{r, include = FALSE, eval = FALSE }
+
 view_robustness_table(all_results_exp, c("social_capital"))
 ```
 
-\theendnotes
+\newpage 
 
+\theendnotes
